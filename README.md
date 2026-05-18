@@ -16,9 +16,21 @@ Built with Expo + React Native (TypeScript), offline-first, modular exercise fra
 ## Local setup
 
 ```bash
-npm install -g expo-cli
+# 1. Clone
+git clone https://github.com/Quamca/gralfabet-code.git
+cd gralfabet-code
+
+# 2. Install dependencies
 npm install
+
+# 3. Start dev server (scan QR in Expo Go on Android)
 npx expo start
+
+# 4. Type-check
+npx tsc --noEmit
+
+# 5. Run tests
+npx jest --passWithNoTests
 ```
 
 To build a local APK for device testing:

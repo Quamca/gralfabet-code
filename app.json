@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "GrAlfabet",
+    "slug": "gralfabet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": ["android", "ios"],
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      }
+    },
+    "scheme": "gralfabet",
+    "plugins": ["expo-router"]
+  }
+}

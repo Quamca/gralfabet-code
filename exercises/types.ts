@@ -5,5 +5,5 @@ export interface ExerciseModule {
   name: string;
   icon: ImageSourcePropType;
   component: React.ComponentType;
-  audioLabel: string;
+  audioLabel: number;
 }

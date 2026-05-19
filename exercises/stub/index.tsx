@@ -14,12 +14,15 @@ const styles = StyleSheet.create({
   text: { fontSize: 18, color: '#888' },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const STUB_AUDIO = require('../../assets/sounds/test-beep.wav') as number;
+
 const stubModule: ExerciseModule = {
   id: 'stub',
   name: 'Stub',
   icon: { uri: '' },
   component: StubExercise,
-  audioLabel: 'stub',
+  audioLabel: STUB_AUDIO,
 };
 
 export default stubModule;

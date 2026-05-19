@@ -1,29 +1,33 @@
 import { Link, Redirect } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { ModuleTile } from '../components/ModuleTile';
+import { getAllModules } from '../exercises/registry';
 import { useAppStore } from '../store/useAppStore';
+
+const modules = getAllModules();
 
 export default function HomeScreen() {
   const hasHydrated = useAppStore((s) => s._hasHydrated);
   const childName = useAppStore((s) => s.childName);
-  const lastOpenedLetterId = useAppStore((s) => s.lastOpenedLetterId);
 
   if (!hasHydrated) return null;
-
-  if (!childName) {
-    return <Redirect href="/setup" />;
-  }
+  if (!childName) return <Redirect href="/setup" />;
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cześć, {childName}!</Text>
-      {lastOpenedLetterId ? (
-        <Text style={styles.subtitle}>Ostatnia litera: {lastOpenedLetterId}</Text>
-      ) : null}
-      <Link href="/exercise/A" style={styles.link}>
-        Ćwiczenie: litera A
-      </Link>
-      <Link href="/settings" style={styles.settingsLink}>
-        Ustawienia
+      <View style={styles.greeting}>
+        <Text style={styles.greetingEmoji}>👋</Text>
+        <Text style={styles.greetingName}>{childName}</Text>
+      </View>
+
+      <View style={styles.grid}>
+        {modules.map((mod) => (
+          <ModuleTile key={mod.id} module={mod} />
+        ))}
+      </View>
+
+      <Link href="/settings" style={styles.settingsLink} accessibilityLabel="Ustawienia">
+        ⚙️
       </Link>
     </View>
   );
@@ -33,28 +37,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
     backgroundColor: '#fff',
+    paddingTop: 60,
+    paddingHorizontal: 24,
   },
-  title: {
-    fontSize: 32,
+  greeting: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 48,
+    gap: 12,
+  },
+  greetingEmoji: {
+    fontSize: 40,
+  },
+  greetingName: {
+    fontSize: 36,
     fontWeight: 'bold',
-    marginBottom: 16,
+    color: '#1C1C1E',
   },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 24,
-    color: '#555',
-  },
-  link: {
-    fontSize: 18,
-    color: '#007AFF',
-    marginTop: 8,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    flex: 1,
   },
   settingsLink: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 32,
+    fontSize: 28,
+    paddingBottom: 32,
   },
 });

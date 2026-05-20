@@ -1,8 +1,8 @@
 import { ExerciseModule } from './types';
-import stubModule from './stub';
+import findTheLetterModule from './find-the-letter';
 
 const registry: Record<string, ExerciseModule> = {
-  [stubModule.id]: stubModule,
+  [findTheLetterModule.id]: findTheLetterModule,
 };
 
 export function getModule(id: string): ExerciseModule | undefined {

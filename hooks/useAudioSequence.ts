@@ -1,20 +1,23 @@
 import { Audio } from 'expo-av';
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export function useAudioSequence() {
-  const cancelledRef = useRef(false);
   const currentSoundRef = useRef<Audio.Sound | null>(null);
+  const seqIdRef = useRef(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const cancel = useCallback(() => {
-    cancelledRef.current = true;
+    seqIdRef.current += 1;
+    setIsPlaying(false);
     void currentSoundRef.current?.stopAsync();
   }, []);
 
   const playSequence = useCallback(async (sounds: number[]): Promise<void> => {
-    cancelledRef.current = false;
+    const myId = ++seqIdRef.current;
+    setIsPlaying(true);
 
     for (const assetId of sounds) {
-      if (cancelledRef.current) break;
+      if (seqIdRef.current !== myId) break;
 
       let sound: Audio.Sound | null = null;
       try {
@@ -22,10 +25,10 @@ export function useAudioSequence() {
         sound = s;
         currentSoundRef.current = s;
 
-        if (!cancelledRef.current) {
+        if (seqIdRef.current === myId) {
           await new Promise<void>((resolve) => {
             s.setOnPlaybackStatusUpdate((status) => {
-              if (!status.isLoaded || status.didJustFinish || cancelledRef.current) {
+              if (!status.isLoaded || status.didJustFinish || seqIdRef.current !== myId) {
                 resolve();
               }
             });
@@ -42,7 +45,11 @@ export function useAudioSequence() {
         }
       }
     }
+
+    if (seqIdRef.current === myId) {
+      setIsPlaying(false);
+    }
   }, []);
 
-  return { playSequence, cancel };
+  return { playSequence, cancel, isPlaying };
 }

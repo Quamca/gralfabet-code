@@ -1,8 +1,12 @@
+import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAudioSequence } from '../../hooks/useAudioSequence';
 import { useProgressStore } from '../../store/useProgressStore';
-import { CONFIRM_ITS, FIND, LETTERS, TRY_AGAIN } from './audio-assets';
+import { DOBRZE, FIND, LETTERS, MODULE_LABEL, TRY_AGAIN } from './audio-assets';
+
+const EXIT_ICON   = require('../../assets/images/shared/exit-button.png');
+const REPEAT_ICON = require('../../assets/images/shared/repeat-button.png');
 
 export type Outcome = 'first-try' | 'second-try' | 'auto-reveal';
 export type RoundResult = { letter: string; outcome: Outcome };
@@ -10,7 +14,6 @@ export type RoundResult = { letter: string; outcome: Outcome };
 const ALL_LETTERS = Object.keys(LETTERS);
 const TOTAL_ROUNDS = 5;
 const HINT_DELAY_MS = 1500;
-const WRONG_FLASH_MS = 600;
 
 function pickTiles(target: string): string[] {
   const pool = ALL_LETTERS.filter((l) => l !== target);
@@ -32,14 +35,16 @@ interface Props {
 }
 
 export function GameScreen({ onComplete }: Props): React.ReactElement {
+  const router = useRouter();
   const { selectLetters, updateLetter } = useProgressStore();
-  const { playSequence, cancel } = useAudioSequence();
+  const { playSequence, cancel, isPlaying } = useAudioSequence();
 
   const [rounds] = useState<string[]>(() => selectLetters(TOTAL_ROUNDS));
   const [roundIndex, setRoundIndex] = useState(0);
   const [tiles, setTiles] = useState<string[]>([]);
   const [errors, setErrors] = useState(0);
-  const [wrongLetter, setWrongLetter] = useState<string | null>(null);
+  const [wrongLetters, setWrongLetters] = useState<string[]>([]);
+  const [correctLetter, setCorrectLetter] = useState<string | null>(null);
   const [showHint, setShowHint] = useState(false);
 
   const lockedRef = useRef(false);
@@ -50,14 +55,20 @@ export function GameScreen({ onComplete }: Props): React.ReactElement {
   roundIndexRef.current = roundIndex;
 
   useEffect(() => {
+    return () => { cancel(); };
+  }, [cancel]);
+
+  useEffect(() => {
     const target = rounds[roundIndex];
     lockedRef.current = false;
     setErrors(0);
-    setWrongLetter(null);
+    setWrongLetters([]);
+    setCorrectLetter(null);
     setShowHint(false);
     setTiles(pickTiles(target));
     cancel();
-    void playSequence([FIND, LETTERS[target]]);
+    const intro = roundIndex === 0 ? MODULE_LABEL : FIND;
+    void playSequence([intro, LETTERS[target]]);
   }, [roundIndex, rounds, cancel, playSequence]);
 
   useEffect(() => {
@@ -85,69 +96,93 @@ export function GameScreen({ onComplete }: Props): React.ReactElement {
 
   const handleTilePress = useCallback((letter: string) => {
     if (lockedRef.current) return;
+    if (wrongLetters.includes(letter)) return;
     const target = rounds[roundIndexRef.current];
     if (letter === target) {
       lockedRef.current = true;
+      setCorrectLetter(letter);
       const outcome: Outcome = errors === 0 ? 'first-try' : 'second-try';
       updateLetter(target, outcome);
       resultsRef.current = [...resultsRef.current, { letter: target, outcome }];
-      void playSequence([CONFIRM_ITS, LETTERS[target]]).then(advance);
+      cancel();
+      void playSequence([DOBRZE]).then(advance);
     } else {
-      setWrongLetter(letter);
-      setTimeout(() => setWrongLetter(null), WRONG_FLASH_MS);
+      const newWrong = [...wrongLetters, letter];
+      setWrongLetters(newWrong);
       const newErrors = errors + 1;
       setErrors(newErrors);
-      void playSequence([TRY_AGAIN]);
       if (newErrors >= 2) {
         lockedRef.current = true;
+        cancel();
         setShowHint(true);
         updateLetter(target, 'auto-reveal');
         resultsRef.current = [...resultsRef.current, { letter: target, outcome: 'auto-reveal' }];
         setTimeout(advance, HINT_DELAY_MS);
+      } else {
+        cancel();
+        void playSequence([TRY_AGAIN]);
       }
     }
-  }, [errors, rounds, advance, updateLetter, playSequence]);
+  }, [errors, wrongLetters, rounds, advance, cancel, updateLetter, playSequence]);
 
   const target = rounds[roundIndex];
+  const canRepeat = !isPlaying && !showHint;
+
+  const handleRepeat = useCallback(() => {
+    if (!canRepeat) return;
+    void playSequence([FIND, LETTERS[rounds[roundIndexRef.current]]]);
+  }, [canRepeat, rounds, playSequence]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.progress}>{roundIndex + 1} / {TOTAL_ROUNDS}</Text>
-      <Text style={styles.prompt}>
-        Znajdź:{' '}
-        <Text style={styles.promptLetter}>{target?.toUpperCase()}</Text>
-      </Text>
-      <View style={styles.grid}>
-        {tiles.map((letter) => {
-          const isTarget = letter === target;
-          const isWrong = letter === wrongLetter;
-          const applyScale = isTarget && showHint;
-          return (
-            <Animated.View
-              key={letter}
-              style={[styles.tileWrap, applyScale ? { transform: [{ scale: pulseAnim }] } : {}]}
-            >
-              <TouchableOpacity
-                style={[styles.tile, isWrong && styles.tileWrong, isTarget && showHint && styles.tileHint]}
-                onPress={() => handleTilePress(letter)}
-                activeOpacity={0.7}
+      <View style={styles.gridArea}>
+        <TouchableOpacity style={[styles.repeatBtn, !canRepeat && styles.repeatBtnDisabled]} onPress={handleRepeat} activeOpacity={0.7}>
+          <Image source={REPEAT_ICON} style={styles.repeatIcon} />
+        </TouchableOpacity>
+        <View style={styles.grid}>
+          {tiles.map((letter) => {
+            const isTarget = letter === target;
+            const isWrong = wrongLetters.includes(letter);
+            const isGreen = letter === correctLetter || (isTarget && showHint);
+            const applyScale = isTarget && showHint;
+            return (
+              <Animated.View
+                key={letter}
+                style={[styles.tileWrap, applyScale ? { transform: [{ scale: pulseAnim }] } : {}]}
               >
-                <Text style={styles.tileUpper}>{letter.toUpperCase()}</Text>
-                <Text style={styles.tileLower}>{letter}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          );
-        })}
+                <TouchableOpacity
+                  style={[styles.tile, isWrong && styles.tileWrong, isGreen && styles.tileHint]}
+                  onPress={() => handleTilePress(letter)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.tileUpper}>{letter.toUpperCase()}</Text>
+                  <Text style={styles.tileLower}>{letter}</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })}
+        </View>
+      </View>
+      <View style={styles.exitArea}>
+        <TouchableOpacity style={styles.exitBtn} onPress={() => { cancel(); router.back(); }} activeOpacity={0.7}>
+          <Image source={EXIT_ICON} style={styles.exitIcon} />
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFDE7', padding: 24 },
-  progress: { fontSize: 16, color: '#888', marginBottom: 8 },
-  prompt: { fontSize: 24, fontWeight: '600', marginBottom: 32, color: '#333' },
-  promptLetter: { color: '#F57F17', fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: '#FFFDE7', padding: 24 },
+  progress: { fontSize: 16, color: '#888', textAlign: 'center', marginBottom: 12 },
+  repeatBtn: { alignSelf: 'center', marginBottom: 16 },
+  repeatBtnDisabled: { opacity: 0.35 },
+  repeatIcon: { width: 72, height: 72, resizeMode: 'contain' },
+  gridArea: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  exitArea: { alignItems: 'center', paddingVertical: 20 },
+  exitBtn: { width: 88, height: 88, alignItems: 'center', justifyContent: 'center' },
+  exitIcon: { width: 80, height: 80, resizeMode: 'contain' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
   tileWrap: { width: '42%' },
   tile: { backgroundColor: '#FFF3CD', borderRadius: 16, paddingVertical: 24, alignItems: 'center', borderWidth: 2, borderColor: '#E8C83A' },

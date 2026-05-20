@@ -1,7 +1,8 @@
 // Static require() — paths must be literal strings, never constructed at runtime.
 
+export const MODULE_LABEL = require('../../assets/sounds/find-the-letter/module-label.mp3') as number;
 export const FIND        = require('../../assets/sounds/shared/phrases/find.mp3') as number;
-export const CONFIRM_ITS = require('../../assets/sounds/shared/phrases/confirm-its.mp3') as number;
+export const DOBRZE      = require('../../assets/sounds/shared/phrases/dobrze.mp3') as number;
 export const TRY_AGAIN   = require('../../assets/sounds/shared/phrases/try-again.mp3') as number;
 
 export const LETTERS: Record<string, number> = {

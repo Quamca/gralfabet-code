@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ExerciseModule } from '../exercises/types';
-import { useAudio } from '../hooks/useAudio';
 
 interface Props {
   module: ExerciseModule;
@@ -9,10 +8,8 @@ interface Props {
 
 export function ModuleTile({ module }: Props) {
   const router = useRouter();
-  const { play } = useAudio(module.audioLabel);
 
-  const handlePress = async () => {
-    await play();
+  const handlePress = () => {
     router.push(`/exercise/${module.id}`);
   };
 
@@ -54,7 +51,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconImage: {
-    width: 48,
-    height: 48,
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });

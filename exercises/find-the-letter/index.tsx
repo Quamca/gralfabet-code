@@ -1,8 +1,10 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ExerciseModule } from '../types';
 import { GameScreen } from './GameScreen';
+
+const EXIT_ICON = require('../../assets/images/shared/exit-button.png');
 
 function FindTheLetterModule(): React.ReactElement {
   const router = useRouter();
@@ -15,8 +17,8 @@ function FindTheLetterModule(): React.ReactElement {
   return (
     <View style={styles.result}>
       <Text style={styles.title}>Koniec!</Text>
-      <TouchableOpacity style={styles.button} onPress={() => router.back()}>
-        <Text style={styles.buttonText}>Wróć do menu</Text>
+      <TouchableOpacity style={styles.exitBtn} onPress={() => router.back()} activeOpacity={0.7}>
+        <Image source={EXIT_ICON} style={styles.exitIcon} />
       </TouchableOpacity>
     </View>
   );
@@ -25,8 +27,8 @@ function FindTheLetterModule(): React.ReactElement {
 const styles = StyleSheet.create({
   result: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFDE7' },
   title: { fontSize: 32, fontWeight: 'bold', color: '#333', marginBottom: 32 },
-  button: { backgroundColor: '#F57F17', borderRadius: 12, paddingVertical: 14, paddingHorizontal: 32 },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
+  exitBtn: { width: 88, height: 88, alignItems: 'center', justifyContent: 'center' },
+  exitIcon: { width: 80, height: 80, resizeMode: 'contain' },
 });
 
 const findTheLetterModule: ExerciseModule = {

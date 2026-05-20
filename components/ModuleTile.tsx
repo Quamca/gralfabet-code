@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ExerciseModule } from '../exercises/types';
 import { useAudio } from '../hooks/useAudio';
 
@@ -18,13 +18,13 @@ export function ModuleTile({ module }: Props) {
 
   return (
     <TouchableOpacity
-      style={styles.tile}
+      style={[styles.tile, { backgroundColor: module.tileColor ?? '#E8F4FD' }]}
       onPress={handlePress}
       accessibilityLabel={module.name}
       accessibilityRole="button"
     >
       <View style={styles.iconBox}>
-        <Text style={styles.iconEmoji}>📖</Text>
+        <Image source={module.icon} style={styles.iconImage} />
       </View>
     </TouchableOpacity>
   );
@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
     height: TILE_SIZE,
     margin: 12,
     borderRadius: 20,
-    backgroundColor: '#E8F4FD',
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -54,7 +53,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconEmoji: {
-    fontSize: 52,
+  iconImage: {
+    width: 48,
+    height: 48,
   },
 });

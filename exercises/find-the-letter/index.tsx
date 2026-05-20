@@ -1,35 +1,30 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ExerciseModule } from '../types';
-import { GameScreen } from './GameScreen';
-
-const EXIT_ICON = require('../../assets/images/shared/exit-button.png');
+import { GameScreen, RoundResult } from './GameScreen';
+import { ResultScreen } from './ResultScreen';
 
 function FindTheLetterModule(): React.ReactElement {
   const router = useRouter();
   const [phase, setPhase] = useState<'playing' | 'result'>('playing');
+  const [results, setResults] = useState<RoundResult[]>([]);
 
   if (phase === 'playing') {
-    return <GameScreen onComplete={() => setPhase('result')} />;
+    return (
+      <GameScreen
+        onComplete={(r) => { setResults(r); setPhase('result'); }}
+      />
+    );
   }
 
   return (
-    <View style={styles.result}>
-      <Text style={styles.title}>Koniec!</Text>
-      <TouchableOpacity style={styles.exitBtn} onPress={() => router.back()} activeOpacity={0.7}>
-        <Image source={EXIT_ICON} style={styles.exitIcon} />
-      </TouchableOpacity>
-    </View>
+    <ResultScreen
+      results={results}
+      onPlayAgain={() => { setResults([]); setPhase('playing'); }}
+      onExit={() => router.back()}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  result: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFDE7' },
-  title: { fontSize: 32, fontWeight: 'bold', color: '#333', marginBottom: 32 },
-  exitBtn: { width: 88, height: 88, alignItems: 'center', justifyContent: 'center' },
-  exitIcon: { width: 80, height: 80, resizeMode: 'contain' },
-});
 
 const findTheLetterModule: ExerciseModule = {
   id: 'find-the-letter',

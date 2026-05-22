@@ -32,7 +32,7 @@ function MissingLetterModule(): React.ReactElement {
 const missingLetterModule: ExerciseModule = {
   id: 'missing-letter',
   name: 'Brakująca litera',
-  icon: null as unknown as number,
+  icon: require('../../assets/images/missing-letter/tile-icon.png'),
   component: MissingLetterModule,
   audioLabel: MODULE_LABEL,
   tileColor: '#E8F5E9',

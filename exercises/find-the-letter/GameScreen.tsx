@@ -10,7 +10,7 @@ import { useProgressStore } from '../../store/useProgressStore';
 import { FIND, LETTERS, MODULE_LABEL, TRY_AGAIN } from './audio-assets';
 import { FanZone } from './FanZone';
 import {
-  CONTAINER_PAD, HINT_DELAY_MS, TILE_H, TILE_W, TOTAL_ROUNDS,
+  CONTAINER_PAD, FADE_OUT_MS, HINT_DELAY_MS, REVEAL_STABLE_MS, TILE_H, TILE_W, TOTAL_ROUNDS,
   pickTiles, type Outcome, type RoundResult,
 } from './gameUtils';
 import { useFlyAnimation } from './useFlyAnimation';
@@ -112,7 +112,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         updateLetter(target, 'auto-reveal');
         resultsRef.current = [...resultsRef.current, { letter: target, outcome: 'auto-reveal' }];
         fly.dropWrongs();
-        setTimeout(() => { cancelAnimation(pulseScale); pulseScale.value = withTiming(1, { duration: 100 }); setTimeout(() => { fly.dropHint(); setTimeout(advance, 300); }, 350); }, HINT_DELAY_MS);
+        setTimeout(() => { cancelAnimation(pulseScale); pulseScale.value = withTiming(1, { duration: 100 }); setTimeout(() => { fly.dropHint(); setTimeout(advance, FADE_OUT_MS); }, REVEAL_STABLE_MS); }, HINT_DELAY_MS);
       } else {
         cancel();
         void playSequence([TRY_AGAIN]);

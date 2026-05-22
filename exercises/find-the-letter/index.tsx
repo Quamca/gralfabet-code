@@ -13,6 +13,7 @@ function FindTheLetterModule(): React.ReactElement {
     return (
       <GameScreen
         onComplete={(r) => { setResults(r); setPhase('result'); }}
+        onExit={() => router.back()}
       />
     );
   }

@@ -33,7 +33,7 @@ export function WordDisplay({ word, gapIndex, filledLetter }: Props): React.Reac
 const styles = StyleSheet.create({
   row:    { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
   letter: { fontSize: 56, fontWeight: 'bold', color: '#333' },
-  gap:    { width: 64, height: 72, alignItems: 'center', justifyContent: 'center', marginHorizontal: 2 },
+  gap:    { alignItems: 'center', justifyContent: 'center', marginHorizontal: 2 },
   filled: { fontSize: 52, fontWeight: 'bold', color: '#2E7D32' },
   blank:  { fontSize: 52, fontWeight: 'bold', color: '#BDBDBD' },
 });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
+import { CONTAINER_PAD, CORRECT_BG, CORRECT_BORDER, SCREEN_BG } from '../shared/tokens';
 import { type RoundResult } from './gameUtils';
 
 const EXIT_ICON       = require('../../assets/images/shared/exit-button.png');
@@ -59,11 +60,11 @@ export function ResultScreen({ results, onPlayAgain, onExit }: Props): React.Rea
 }
 
 const styles = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#FFFDE7', padding: 24 },
+  container:    { flex: 1, backgroundColor: SCREEN_BG, padding: CONTAINER_PAD },
   content:      { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title:        { fontSize: 28, fontWeight: 'bold', color: '#333', textAlign: 'center', marginBottom: 24 },
   grid:         { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
-  card:         { backgroundColor: '#C8E6C9', borderRadius: 16, paddingVertical: 20, paddingHorizontal: 16, alignItems: 'center', borderWidth: 2, borderColor: '#43A047', minWidth: '42%' },
+  card:         { backgroundColor: CORRECT_BG, borderRadius: 16, paddingVertical: 20, paddingHorizontal: 16, alignItems: 'center', borderWidth: 2, borderColor: CORRECT_BORDER, minWidth: '42%' },
   cardUpper:    { fontSize: 48, fontWeight: 'bold', color: '#333' },
   cardLower:    { fontSize: 24, color: '#666', marginTop: 4 },
   emptySection: { alignItems: 'center' },

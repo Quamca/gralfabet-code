@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { CONTAINER_PAD } from '../shared/tokens';
-import { FADE_OUT_MS, REVEAL_STABLE_MS } from '../shared/timings';
+import { FADE_OUT_MS, FLY_DURATION_MS, FLY_FADE_MS, REVEAL_STABLE_MS } from '../shared/timings';
 import { DOBRZE } from './audio-assets';
 import { FAN_W, IMAGE_SIZE, STACK_PEEK, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
 import { type CollectedItem } from './ImageFanZone';
@@ -63,8 +63,8 @@ export function useFlyAnimation() {
           flyOpacity.value = 1;
           setIsFlyingImage(true);
 
-          flyX.value = withTiming(targetX, { duration: 350 });
-          flyY.value = withTiming(targetY, { duration: 350 });
+          flyX.value = withTiming(targetX, { duration: FLY_DURATION_MS });
+          flyY.value = withTiming(targetY, { duration: FLY_DURATION_MS });
 
           dropWrongs();
           updateLetter(letter, outcome);
@@ -72,10 +72,10 @@ export function useFlyAnimation() {
           cancel();
 
           const audios = [currentEntry.audioWord, DOBRZE].filter((a): a is number => a !== null);
-          const afterPlay = audios.length > 0 ? playSequence(audios) : Promise.resolve();
+          const afterPlay = audios.length > 0 ? playSequence(audios) : new Promise<void>((res) => setTimeout(res, FLY_DURATION_MS));
           void afterPlay.then(() => {
             setCollected((prev) => [...prev, newItem]);
-            flyOpacity.value = withTiming(0, { duration: 150 }, (done) => {
+            flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
               if (done) {
                 runOnJS(setIsFlyingImage)(false);
                 runOnJS(advance)();

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { DOBRZE } from './audio-assets';
-import { CONTAINER_PAD, FADE_OUT_MS, FAN_W, STACK_PEEK, TILE_W, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
+import { CONTAINER_PAD, FADE_OUT_MS, FAN_W, FLY_DURATION_MS, FLY_FADE_MS, STACK_PEEK, TILE_W, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
 
 export interface FlyArgs {
   safeTopOffset: number;
@@ -57,8 +57,8 @@ export function useFlyAnimation() {
         flyOpacity.value = 1;
         setFlyingLetter(letter);
 
-        flyX.value = withTiming(targetX, { duration: 350 });
-        flyY.value = withTiming(targetY, { duration: 350 });
+        flyX.value = withTiming(targetX, { duration: FLY_DURATION_MS });
+        flyY.value = withTiming(targetY, { duration: FLY_DURATION_MS });
 
         dropWrongs();
         updateLetter(letter, outcome);
@@ -67,7 +67,7 @@ export function useFlyAnimation() {
 
         void playSequence([DOBRZE]).then(() => {
           setCollected(newCollected);
-          flyOpacity.value = withTiming(0, { duration: 150 }, (done) => {
+          flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
             if (done) {
               runOnJS(setFlyingLetter)(null);
               runOnJS(advance)();

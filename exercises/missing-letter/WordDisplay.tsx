@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
-import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
+
 
 interface Props {
   word: string;
@@ -33,7 +33,7 @@ export function WordDisplay({ word, gapIndex, filledLetter }: Props): React.Reac
 const styles = StyleSheet.create({
   row:    { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
   letter: { fontSize: 56, fontWeight: 'bold', color: '#333' },
-  gap:    { width: 64, height: 72, backgroundColor: CORRECT_BG, borderRadius: 8, borderWidth: 2, borderColor: CORRECT_BORDER, alignItems: 'center', justifyContent: 'center', marginHorizontal: 2 },
+  gap:    { width: 64, height: 72, alignItems: 'center', justifyContent: 'center', marginHorizontal: 2 },
   filled: { fontSize: 52, fontWeight: 'bold', color: '#2E7D32' },
   blank:  { fontSize: 52, fontWeight: 'bold', color: '#BDBDBD' },
 });

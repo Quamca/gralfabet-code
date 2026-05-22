@@ -9,6 +9,7 @@ import { useAudioSequence } from '../../hooks/useAudioSequence';
 import { useProgressStore } from '../../store/useProgressStore';
 import { FIND, LETTERS, MODULE_LABEL, TRY_AGAIN } from './audio-assets';
 import { FanZone } from './FanZone';
+import { ReplayButton } from '../shared/ReplayButton';
 import {
   CONTAINER_PAD, FADE_OUT_MS, HINT_DELAY_MS, REVEAL_STABLE_MS, TILE_H, TILE_W, TOTAL_ROUNDS,
   pickTiles, type Outcome, type RoundResult,
@@ -18,7 +19,6 @@ import { useFlyAnimation } from './useFlyAnimation';
 export type { Outcome, RoundResult };
 
 const EXIT_ICON   = require('../../assets/images/shared/exit-button.png');
-const REPEAT_ICON = require('../../assets/images/shared/repeat-button.png');
 
 interface Props {
   onComplete: (results: RoundResult[]) => void;
@@ -128,13 +128,10 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
       <View style={[styles.content, { paddingTop: safeTop + CONTAINER_PAD }]}>
         <FanZone letters={collected} />
         <View style={styles.gridArea}>
-          <TouchableOpacity
-            style={[styles.repeatBtn, !canRepeat && styles.dim]}
-            onPress={() => { if (canRepeat) void playSequence([FIND, LETTERS[rounds[roundIndexRef.current]]]); }}
-            activeOpacity={0.7}
-          >
-            <Image source={REPEAT_ICON} style={styles.repeatIcon} />
-          </TouchableOpacity>
+          <ReplayButton
+            onPress={() => void playSequence([FIND, LETTERS[rounds[roundIndexRef.current]]])}
+            disabled={!canRepeat}
+          />
           <View style={styles.grid}>
             {tiles.map((letter) => {
               const isWrong      = wrongLetters.includes(letter);
@@ -185,10 +182,7 @@ const styles = StyleSheet.create({
   content:     { flex: 1, padding: CONTAINER_PAD },
   gridArea:    { flex: 1, alignItems: 'center', justifyContent: 'center' },
   bottom:      { alignItems: 'center', paddingVertical: 20 },
-  repeatBtn:   { alignSelf: 'center', marginBottom: 16 },
-  dim:         { opacity: 0.35 },
   invisible:   { opacity: 0 },
-  repeatIcon:  { width: 72, height: 72, resizeMode: 'contain' },
   exitIcon:    { width: 80, height: 80, resizeMode: 'contain' },
   grid:        { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
   tile:        { width: TILE_W, height: TILE_H, backgroundColor: '#FFF3CD', borderRadius: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#E8C83A' },

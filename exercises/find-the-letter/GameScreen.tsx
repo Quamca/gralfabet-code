@@ -31,6 +31,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const { top: safeTop } = useSafeAreaInsets();
   const fly      = useFlyAnimation();
   const tilesOp  = fly.tilesOp;
+  const hintOp   = fly.hintOp;
 
   const [rounds]      = useState<string[]>(() => selectLetters(TOTAL_ROUNDS));
   const [roundIndex, setRoundIndex] = useState(0);
@@ -48,9 +49,8 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   roundIndexRef.current = roundIndex;
 
   const pulseScale = useSharedValue(1);
-  const tileStyle  = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }], opacity: tilesOp.value,
-  }));
+  const tileStyle  = useAnimatedStyle(() => ({ opacity: tilesOp.value }));
+  const hintStyle  = useAnimatedStyle(() => ({ transform: [{ scale: pulseScale.value }], opacity: hintOp.value }));
 
   useEffect(() => { return () => { cancel(); }; }, [cancel]);
 
@@ -112,7 +112,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         updateLetter(target, 'auto-reveal');
         resultsRef.current = [...resultsRef.current, { letter: target, outcome: 'auto-reveal' }];
         fly.dropWrongs();
-        setTimeout(advance, HINT_DELAY_MS);
+        setTimeout(() => { fly.dropHint(); setTimeout(advance, 350); }, HINT_DELAY_MS);
       } else {
         cancel();
         void playSequence([TRY_AGAIN]);
@@ -146,7 +146,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
                   ref={(r) => { tileRefs.current[letter] = r; }}
                   style={isFlyingAway ? styles.invisible : undefined}
                 >
-                  <Animated.View style={tileStyle}>
+                  <Animated.View style={isHint ? hintStyle : tileStyle}>
                     <TouchableOpacity
                       style={[styles.tile, isWrong && styles.tileWrong, isHint && styles.tileHint]}
                       onPress={() => handleTilePress(letter)}

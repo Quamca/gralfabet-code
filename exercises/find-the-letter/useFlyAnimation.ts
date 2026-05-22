@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { DOBRZE } from './audio-assets';
-import { CONTAINER_PAD, FAN_W, TILE_W, type Outcome, type RoundResult } from './gameUtils';
+import { CONTAINER_PAD, FAN_W, STACK_PEEK, TILE_W, type Outcome, type RoundResult } from './gameUtils';
 
 export interface FlyArgs {
   safeTopOffset: number;
@@ -26,6 +26,7 @@ export function useFlyAnimation() {
   const flyY       = useSharedValue(0);
   const flyOpacity = useSharedValue(0);
   const tilesOp    = useSharedValue(1);
+  const hintOp     = useSharedValue(1);
 
   const flyStyle = useAnimatedStyle(() => ({
     left: flyX.value,
@@ -33,9 +34,11 @@ export function useFlyAnimation() {
     opacity: flyOpacity.value,
   }));
 
-  function resetWrongs() { tilesOp.value = 1; }
+  function resetWrongs() { tilesOp.value = 1; hintOp.value = 1; }
 
   function dropWrongs() { tilesOp.value = withTiming(0, { duration: 400 }); }
+
+  function dropHint() { hintOp.value = withTiming(0, { duration: 300 }); }
 
   function startFly({
     safeTopOffset, letter, outcome, collected, containerRef, tileRefs,
@@ -44,8 +47,8 @@ export function useFlyAnimation() {
     const newCollected = [...collected, letter];
     const idx = collected.length;
     const n   = newCollected.length;
-    const fanLeft = n <= 1 ? (FAN_W - TILE_W) / 2 : idx * (FAN_W - TILE_W) / (n - 1);
-    const targetX = CONTAINER_PAD + fanLeft;
+    const cardLeft = (FAN_W - TILE_W - (n - 1) * STACK_PEEK) / 2 + idx * STACK_PEEK;
+    const targetX  = CONTAINER_PAD + cardLeft;
     const targetY = safeTopOffset + CONTAINER_PAD + 8;
 
     containerRef.current?.measure((_a, _b, _c, _d, cPx, cPy) => {
@@ -76,5 +79,5 @@ export function useFlyAnimation() {
     });
   }
 
-  return { flyingLetter, flyStyle, tilesOp, resetWrongs, dropWrongs, startFly };
+  return { flyingLetter, flyStyle, tilesOp, hintOp, resetWrongs, dropWrongs, dropHint, startFly };
 }

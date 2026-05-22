@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
-import { TILE_H, TILE_W } from './gameUtils';
+import { STACK_PEEK, TILE_H, TILE_W } from './gameUtils';
 
 interface Props {
   letters: string[];
@@ -13,9 +13,8 @@ export function FanZone({ letters }: Props): React.ReactElement {
     setZoneWidth(e.nativeEvent.layout.width);
   }
 
-  function cardLeft(index: number, total: number): number {
-    if (total <= 1) return (zoneWidth - TILE_W) / 2;
-    return index * (zoneWidth - TILE_W) / (total - 1);
+  function stackLeft(index: number, total: number): number {
+    return (zoneWidth - TILE_W - (total - 1) * STACK_PEEK) / 2 + index * STACK_PEEK;
   }
 
   return (
@@ -25,7 +24,7 @@ export function FanZone({ letters }: Props): React.ReactElement {
           key={letter}
           style={[
             styles.card,
-            { left: cardLeft(i, letters.length), zIndex: i },
+            { left: stackLeft(i, letters.length), zIndex: i },
           ]}
         >
           <Text style={styles.upper}>{letter.toUpperCase()}</Text>

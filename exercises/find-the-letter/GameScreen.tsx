@@ -29,7 +29,8 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const { selectLetters, updateLetter } = useProgressStore();
   const { playSequence, cancel, isPlaying } = useAudioSequence();
   const { top: safeTop } = useSafeAreaInsets();
-  const fly = useFlyAnimation();
+  const fly      = useFlyAnimation();
+  const tilesOp  = fly.tilesOp;
 
   const [rounds]      = useState<string[]>(() => selectLetters(TOTAL_ROUNDS));
   const [roundIndex, setRoundIndex] = useState(0);
@@ -48,7 +49,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
 
   const pulseScale = useSharedValue(1);
   const tileStyle  = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }], opacity: fly.tilesOp.value,
+    transform: [{ scale: pulseScale.value }], opacity: tilesOp.value,
   }));
 
   useEffect(() => { return () => { cancel(); }; }, [cancel]);

@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { View } from 'react-native';
-import {
-  runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming,
-} from 'react-native-reanimated';
+import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { DOBRZE } from './audio-assets';
 import { CONTAINER_PAD, FAN_W, TILE_W, type Outcome, type RoundResult } from './gameUtils';
 
 export interface FlyArgs {
+  safeTopOffset: number;
   letter: string;
   outcome: Outcome;
   collected: string[];
@@ -26,7 +25,7 @@ export function useFlyAnimation() {
   const flyX       = useSharedValue(0);
   const flyY       = useSharedValue(0);
   const flyOpacity = useSharedValue(0);
-  const wrongsOp   = useSharedValue(1);
+  const tilesOp    = useSharedValue(1);
 
   const flyStyle = useAnimatedStyle(() => ({
     left: flyX.value,
@@ -34,20 +33,12 @@ export function useFlyAnimation() {
     opacity: flyOpacity.value,
   }));
 
-  const wrongStyle = useAnimatedStyle(() => ({
-    opacity: wrongsOp.value,
-  }));
+  function resetWrongs() { tilesOp.value = 1; }
 
-  function resetWrongs() {
-    wrongsOp.value = 1;
-  }
-
-  function dropWrongs() {
-    wrongsOp.value = withTiming(0, { duration: 450 });
-  }
+  function dropWrongs() { tilesOp.value = withTiming(0, { duration: 400 }); }
 
   function startFly({
-    letter, outcome, collected, containerRef, tileRefs,
+    safeTopOffset, letter, outcome, collected, containerRef, tileRefs,
     advance, cancel, playSequence, updateLetter, resultsRef, setCollected,
   }: FlyArgs) {
     const newCollected = [...collected, letter];
@@ -55,7 +46,7 @@ export function useFlyAnimation() {
     const n   = newCollected.length;
     const fanLeft = n <= 1 ? (FAN_W - TILE_W) / 2 : idx * (FAN_W - TILE_W) / (n - 1);
     const targetX = CONTAINER_PAD + fanLeft;
-    const targetY = CONTAINER_PAD + 8;
+    const targetY = safeTopOffset + CONTAINER_PAD + 8;
 
     containerRef.current?.measure((_a, _b, _c, _d, cPx, cPy) => {
       tileRefs.current[letter]?.measure((_a, _b, _c, _d, tPx, tPy) => {
@@ -64,8 +55,8 @@ export function useFlyAnimation() {
         flyOpacity.value = 1;
         setFlyingLetter(letter);
 
-        flyX.value = withSpring(targetX, { damping: 18, stiffness: 160 });
-        flyY.value = withSpring(targetY, { damping: 18, stiffness: 160 });
+        flyX.value = withTiming(targetX, { duration: 350 });
+        flyY.value = withTiming(targetY, { duration: 350 });
 
         dropWrongs();
         updateLetter(letter, outcome);
@@ -85,5 +76,5 @@ export function useFlyAnimation() {
     });
   }
 
-  return { flyingLetter, flyStyle, wrongStyle, resetWrongs, dropWrongs, startFly };
+  return { flyingLetter, flyStyle, tilesOp, resetWrongs, dropWrongs, startFly };
 }

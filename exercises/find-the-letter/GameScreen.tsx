@@ -4,6 +4,7 @@ import Animated, {
   cancelAnimation, useAnimatedStyle, useSharedValue,
   withRepeat, withSequence, withTiming,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAudioSequence } from '../../hooks/useAudioSequence';
 import { useProgressStore } from '../../store/useProgressStore';
 import { FIND, LETTERS, MODULE_LABEL, TRY_AGAIN } from './audio-assets';
@@ -27,6 +28,7 @@ interface Props {
 export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const { selectLetters, updateLetter } = useProgressStore();
   const { playSequence, cancel, isPlaying } = useAudioSequence();
+  const { top: safeTop } = useSafeAreaInsets();
   const fly = useFlyAnimation();
 
   const [rounds]      = useState<string[]>(() => selectLetters(TOTAL_ROUNDS));
@@ -45,8 +47,8 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   roundIndexRef.current = roundIndex;
 
   const pulseScale = useSharedValue(1);
-  const pulseStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pulseScale.value }],
+  const tileStyle  = useAnimatedStyle(() => ({
+    transform: [{ scale: pulseScale.value }], opacity: fly.tilesOp.value,
   }));
 
   useEffect(() => { return () => { cancel(); }; }, [cancel]);
@@ -92,6 +94,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     if (letter === target) {
       lockedRef.current = true;
       fly.startFly({
+        safeTopOffset: safeTop,
         letter,
         outcome: errors === 0 ? 'first-try' : 'second-try',
         collected, containerRef, tileRefs, advance, cancel,
@@ -114,14 +117,14 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         void playSequence([TRY_AGAIN]);
       }
     }
-  }, [errors, wrongLetters, rounds, collected, advance, cancel, updateLetter, playSequence, fly]);
+  }, [errors, wrongLetters, rounds, collected, safeTop, advance, cancel, updateLetter, playSequence, fly]);
 
   const canRepeat = !isPlaying && !showHint;
   const target    = rounds[roundIndex];
 
   return (
     <View ref={containerRef} style={styles.container}>
-      <View style={styles.content}>
+      <View style={[styles.content, { paddingTop: safeTop + CONTAINER_PAD }]}>
         <FanZone letters={collected} />
         <View style={styles.gridArea}>
           <TouchableOpacity
@@ -142,7 +145,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
                   ref={(r) => { tileRefs.current[letter] = r; }}
                   style={isFlyingAway ? styles.invisible : undefined}
                 >
-                  <Animated.View style={isWrong ? fly.wrongStyle : (isHint ? pulseStyle : undefined)}>
+                  <Animated.View style={tileStyle}>
                     <TouchableOpacity
                       style={[styles.tile, isWrong && styles.tileWrong, isHint && styles.tileHint]}
                       onPress={() => handleTilePress(letter)}

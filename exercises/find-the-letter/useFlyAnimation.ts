@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { DOBRZE } from './audio-assets';
-import { CONTAINER_PAD, FAN_W, STACK_PEEK, TILE_W, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
+import { CONTAINER_PAD, FADE_OUT_MS, FAN_W, STACK_PEEK, TILE_W, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
 
 export interface FlyArgs {
   safeTopOffset: number;
@@ -38,7 +38,7 @@ export function useFlyAnimation() {
 
   function dropWrongs() { tilesOp.value = withTiming(0, { duration: 400 }); }
 
-  function dropHint() { hintOp.value = withTiming(0, { duration: 300 }); }
+  function dropHint() { hintOp.value = withTiming(0, { duration: FADE_OUT_MS }); }
 
   function startFly({
     safeTopOffset, letter, outcome, collected, containerRef, tileRefs,

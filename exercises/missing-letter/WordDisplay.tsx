@@ -10,22 +10,25 @@ interface Props {
 }
 
 export function WordDisplay({ word, gapIndex, filledLetter }: Props): React.ReactElement {
-  const upper = word.slice(0, gapIndex).toUpperCase();
-  const lower = word.slice(gapIndex + 1).toUpperCase();
+  const before = gapIndex === 0
+    ? ''
+    : word[0].toUpperCase() + word.slice(1, gapIndex).toLowerCase();
+  const after  = word.slice(gapIndex + 1).toLowerCase();
+  const isFirst = gapIndex === 0;
 
   return (
     <View style={styles.row}>
-      {upper.length > 0 && <Text style={styles.letter}>{upper}</Text>}
+      {before.length > 0 && <Text style={styles.letter}>{before}</Text>}
       <View style={styles.gap}>
         {filledLetter ? (
           <Animated.Text entering={ZoomIn.duration(250)} style={styles.filled}>
-            {filledLetter.toUpperCase()}
+            {isFirst ? filledLetter.toUpperCase() : filledLetter.toLowerCase()}
           </Animated.Text>
         ) : (
           <Text style={styles.blank}>_</Text>
         )}
       </View>
-      {lower.length > 0 && <Text style={styles.letter}>{lower}</Text>}
+      {after.length > 0 && <Text style={styles.letter}>{after}</Text>}
     </View>
   );
 }

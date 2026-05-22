@@ -71,9 +71,7 @@ export function useFlyAnimation() {
           resultsRef.current = [...resultsRef.current, { letter, outcome }];
           cancel();
 
-          const audios = [currentEntry.audioWord, DOBRZE].filter((a): a is number => a !== null);
-          const afterPlay = audios.length > 0 ? playSequence(audios) : new Promise<void>((res) => setTimeout(res, FLY_DURATION_MS));
-          void afterPlay.then(() => {
+          void playSequence([DOBRZE]).then(() => {
             setCollected((prev) => [...prev, newItem]);
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
               if (done) {

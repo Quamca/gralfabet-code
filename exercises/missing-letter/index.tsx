@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
+import { MODULE_LABEL } from './audio-assets';
 import { ExerciseModule } from '../types';
 import { GameScreen } from './GameScreen';
 import { type CollectedItem } from './ImageFanZone';
@@ -33,7 +34,7 @@ const missingLetterModule: ExerciseModule = {
   name: 'Brakująca litera',
   icon: null as unknown as number,
   component: MissingLetterModule,
-  audioLabel: null as unknown as number,
+  audioLabel: MODULE_LABEL,
   tileColor: '#E8F5E9',
 };
 

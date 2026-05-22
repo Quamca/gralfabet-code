@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   cancelAnimation, useAnimatedStyle, useSharedValue,
   withRepeat, withSequence, withTiming,
@@ -8,15 +8,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAudioSequence } from '../../hooks/useAudioSequence';
 import { useProgressStore } from '../../store/useProgressStore';
 import { ReplayButton } from '../shared/ReplayButton';
-import { TRY_AGAIN } from './audio-assets';
+import { FIND, LETTERS, TRY_AGAIN, WORD_CONTEXT } from './audio-assets';
 import { ImageFanZone, type CollectedItem } from './ImageFanZone';
 import { useFlyAnimation } from './useFlyAnimation';
 import { WordDisplay } from './WordDisplay';
 import {
   CONTAINER_PAD, FADE_OUT_MS, HINT_DELAY_MS, REVEAL_STABLE_MS,
-  TILE_H, TILE_W, TOTAL_ROUNDS, WORD_KEYS, WORDS,
+  TOTAL_ROUNDS, WORD_KEYS, WORDS,
   pickTiles, selectGameLetters, type Outcome, type RoundResult, type WordEntry,
 } from './gameUtils';
+import { styles } from './game-styles';
 
 export type { Outcome, RoundResult };
 
@@ -36,8 +37,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const [rounds]     = useState<string[]>(() => selectGameLetters(TOTAL_ROUNDS));
   const [allEntries] = useState<WordEntry[]>(() => rounds.map((l) => {
     const pool = WORDS[l] ?? [];
-    return pool[Math.floor(Math.random() * pool.length)] ??
-      { word: l, gapIndex: 0, image: null, audioInstruction: null, audioShort: null, audioWord: null };
+    return pool[Math.floor(Math.random() * pool.length)] ?? { word: l, gapIndex: 0, image: null };
   }));
   const [allTiles]   = useState<string[][]>(() => rounds.map((l) => pickTiles(l, WORD_KEYS)));
   const [roundIndex, setRoundIndex]     = useState(0);
@@ -77,9 +77,10 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     setFilledLetter(null);
     fly.resetWrongs();
     cancel();
-    const entry = allEntries[roundIndex];
-    const audio = roundIndex === 0 ? entry.audioInstruction : entry.audioShort;
-    if (audio) void playSequence([audio]);
+    const entry  = allEntries[roundIndex];
+    const target = rounds[roundIndex];
+    const key    = entry.gapIndex === 0 ? `jak-${entry.word}` : `w-słowie-${entry.word}`;
+    void playSequence(roundIndex === 0 ? [FIND, LETTERS[target], WORD_CONTEXT[key]] : [LETTERS[target], WORD_CONTEXT[key]]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundIndex]);
 
@@ -137,7 +138,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         }, HINT_DELAY_MS);
       } else {
         cancel();
-        if (TRY_AGAIN) void playSequence([TRY_AGAIN]);
+        void playSequence([TRY_AGAIN]);
       }
     }
   }, [errors, wrongLetters, rounds, collected, safeTop, advance, cancel, updateLetter, playSequence, fly, allEntries, pulseScale, setCollectedAndRef]);
@@ -161,8 +162,8 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
           <ReplayButton
             onPress={() => {
               if (canRepeat) {
-                const a = roundIndex === 0 ? currentEntry.audioInstruction : currentEntry.audioShort;
-                if (a) void playSequence([a]);
+                const key = currentEntry.gapIndex === 0 ? `jak-${currentEntry.word}` : `w-słowie-${currentEntry.word}`;
+                void playSequence(roundIndex === 0 ? [FIND, LETTERS[target], WORD_CONTEXT[key]] : [LETTERS[target], WORD_CONTEXT[key]]);
               }
             }}
             disabled={!canRepeat}
@@ -202,24 +203,3 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container:     { flex: 1, backgroundColor: '#FFFDE7' },
-  content:       { flex: 1, padding: CONTAINER_PAD },
-  centerArea:    { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  illustration:  { width: 180, height: 180, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  hidden:        { opacity: 0 },
-  image:         { width: 160, height: 160, resizeMode: 'contain' },
-  imgPlaceholder:{ width: 160, height: 160, backgroundColor: '#E0E0E0', borderRadius: 12 },
-  bottom:        { alignItems: 'center', paddingVertical: 20 },
-  grid:          { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16, marginTop: 16 },
-  tile:          { width: TILE_W, height: TILE_H, backgroundColor: '#FFF3CD', borderRadius: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#E8C83A' },
-  tileWrong:     { backgroundColor: '#FFCDD2', borderColor: '#E53935' },
-  tileHint:      { backgroundColor: '#C8E6C9', borderColor: '#43A047' },
-  tileUpper:     { fontSize: 48, fontWeight: 'bold', color: '#333' },
-  tileLower:     { fontSize: 24, color: '#666', marginTop: 4 },
-  exitIcon:      { width: 80, height: 80, resizeMode: 'contain' },
-  flyCard:       { position: 'absolute', zIndex: 999, width: 100, height: 100, backgroundColor: '#C8E6C9', borderRadius: 12, borderWidth: 2, borderColor: '#43A047', alignItems: 'center', justifyContent: 'center' },
-  flyImage:      { width: 84, height: 84, resizeMode: 'contain' },
-  flyPlaceholder:{ width: 84, height: 84, backgroundColor: '#B0BEC5', borderRadius: 8 },
-});

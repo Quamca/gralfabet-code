@@ -1,0 +1,35 @@
+import React from 'react';
+import { Image, StyleSheet, View } from 'react-native';
+import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
+import { FAN_W, IMAGE_SIZE, STACK_PEEK, TOTAL_ROUNDS } from './gameUtils';
+
+export type CollectedItem = { image: number | null; word: string };
+
+interface Props {
+  items: CollectedItem[];
+}
+
+const STACK_BASE = (FAN_W - IMAGE_SIZE - (TOTAL_ROUNDS - 1) * STACK_PEEK) / 2;
+
+export function ImageFanZone({ items }: Props): React.ReactElement {
+  return (
+    <View style={styles.zone}>
+      {items.map((item, i) => (
+        <View key={item.word + i} style={[styles.card, { left: STACK_BASE + i * STACK_PEEK, zIndex: i }]}>
+          {item.image ? (
+            <Image source={item.image} style={styles.img} />
+          ) : (
+            <View style={styles.placeholder} />
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  zone:        { width: '100%', height: IMAGE_SIZE + 16, position: 'relative' },
+  card:        { position: 'absolute', top: 8, width: IMAGE_SIZE, height: IMAGE_SIZE, backgroundColor: CORRECT_BG, borderRadius: 12, borderWidth: 2, borderColor: CORRECT_BORDER, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  img:         { width: IMAGE_SIZE - 8, height: IMAGE_SIZE - 8, resizeMode: 'contain' },
+  placeholder: { width: IMAGE_SIZE - 16, height: IMAGE_SIZE - 16, backgroundColor: CORRECT_BORDER, borderRadius: 8, opacity: 0.3 },
+});

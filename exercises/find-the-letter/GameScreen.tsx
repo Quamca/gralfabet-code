@@ -81,11 +81,11 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
 
   const advance = useCallback(() => {
     lockedRef.current = false;
-    if (roundIndexRef.current < TOTAL_ROUNDS - 1) {
-      setRoundIndex((r) => r + 1);
-    } else {
-      onComplete(resultsRef.current);
-    }
+    setWrongLetters([]);
+    setShowHint(false);
+    roundIndexRef.current < TOTAL_ROUNDS - 1
+      ? setRoundIndex((r) => r + 1)
+      : onComplete(resultsRef.current);
   }, [onComplete]);
 
   const handleTilePress = useCallback((letter: string) => {
@@ -112,7 +112,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         updateLetter(target, 'auto-reveal');
         resultsRef.current = [...resultsRef.current, { letter: target, outcome: 'auto-reveal' }];
         fly.dropWrongs();
-        setTimeout(() => { fly.dropHint(); setTimeout(advance, 350); }, HINT_DELAY_MS);
+        setTimeout(() => { cancelAnimation(pulseScale); pulseScale.value = withTiming(1, { duration: 100 }); setTimeout(() => { fly.dropHint(); setTimeout(advance, 300); }, 350); }, HINT_DELAY_MS);
       } else {
         cancel();
         void playSequence([TRY_AGAIN]);
@@ -196,5 +196,5 @@ const styles = StyleSheet.create({
   tileHint:    { backgroundColor: '#C8E6C9', borderColor: '#43A047' },
   tileUpper:   { fontSize: 48, fontWeight: 'bold', color: '#333' },
   tileLower:   { fontSize: 24, color: '#666', marginTop: 4 },
-  flyCard:     { position: 'absolute', backgroundColor: '#C8E6C9', borderRadius: 16, borderWidth: 2, borderColor: '#43A047', alignItems: 'center', justifyContent: 'center' },
+  flyCard:     { position: 'absolute', zIndex: 999, backgroundColor: '#C8E6C9', borderRadius: 16, borderWidth: 2, borderColor: '#43A047', alignItems: 'center', justifyContent: 'center' },
 });

@@ -54,6 +54,7 @@ export function useFlyAnimation() {
     const targetY   = safeTopOffset + CONTAINER_PAD + 8;
 
     setFilledLetter(letter);
+    void playSequence([DOBRZE]);
 
     setTimeout(() => {
       containerRef.current?.measure((_a, _b, _c, _d, cPx, cPy) => {
@@ -71,7 +72,7 @@ export function useFlyAnimation() {
           resultsRef.current = [...resultsRef.current, { letter, outcome }];
           cancel();
 
-          void playSequence([DOBRZE]).then(() => {
+          setTimeout(() => {
             setCollected((prev) => [...prev, newItem]);
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
               if (done) {
@@ -79,7 +80,7 @@ export function useFlyAnimation() {
                 runOnJS(advance)();
               }
             });
-          });
+          }, FLY_DURATION_MS);
         });
       });
     }, REVEAL_STABLE_MS);

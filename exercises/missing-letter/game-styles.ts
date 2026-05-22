@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   tileUpper:      { fontSize: 48, fontWeight: 'bold', color: '#333' },
   tileLower:      { fontSize: 24, color: '#666', marginTop: 4 },
   exitIcon:       { width: 80, height: 80, resizeMode: 'contain' },
-  flyCard:        { position: 'absolute', zIndex: 999, width: 100, height: 100, backgroundColor: '#C8E6C9', borderRadius: 12, borderWidth: 2, borderColor: '#43A047', alignItems: 'center', justifyContent: 'center' },
-  flyImage:       { width: 84, height: 84, resizeMode: 'contain' },
-  flyPlaceholder: { width: 84, height: 84, backgroundColor: '#B0BEC5', borderRadius: 8 },
+  flyCard:    { position: 'absolute', zIndex: 999, width: 100, height: 100, alignItems: 'center', justifyContent: 'center' },
+  flyImage:   { width: 100, height: 100, resizeMode: 'contain' },
+  flySymbol:  { fontSize: 64, fontWeight: 'bold', color: '#555' },
 });

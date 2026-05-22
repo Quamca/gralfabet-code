@@ -197,7 +197,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         <Animated.View style={[styles.flyCard, fly.flyStyle]} pointerEvents="none">
           {currentEntry.image
             ? <Image source={currentEntry.image} style={styles.flyImage} />
-            : <View style={styles.flyPlaceholder} />}
+            : <Text style={styles.flySymbol}>_</Text>}
         </Animated.View>
       )}
     </View>

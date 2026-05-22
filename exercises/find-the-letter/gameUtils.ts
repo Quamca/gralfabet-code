@@ -11,6 +11,7 @@ export const TILE_H        = 140;
 export const FAN_W         = SCREEN_W - CONTAINER_PAD * 2;
 export const TOTAL_ROUNDS  = 5;
 export const HINT_DELAY_MS = 1500;
+export const STACK_PEEK    = 12;
 
 export type Outcome     = 'first-try' | 'second-try' | 'auto-reveal';
 export type RoundResult = { letter: string; outcome: Outcome };

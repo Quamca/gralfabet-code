@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View } from 'react-native';
 import { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { DOBRZE } from './audio-assets';
-import { CONTAINER_PAD, FAN_W, STACK_PEEK, TILE_W, type Outcome, type RoundResult } from './gameUtils';
+import { CONTAINER_PAD, FAN_W, STACK_PEEK, TILE_W, TOTAL_ROUNDS, type Outcome, type RoundResult } from './gameUtils';
 
 export interface FlyArgs {
   safeTopOffset: number;
@@ -45,10 +45,9 @@ export function useFlyAnimation() {
     advance, cancel, playSequence, updateLetter, resultsRef, setCollected,
   }: FlyArgs) {
     const newCollected = [...collected, letter];
-    const idx = collected.length;
-    const n   = newCollected.length;
-    const cardLeft = (FAN_W - TILE_W - (n - 1) * STACK_PEEK) / 2 + idx * STACK_PEEK;
-    const targetX  = CONTAINER_PAD + cardLeft;
+    const idx       = collected.length;
+    const stackBase = (FAN_W - TILE_W - (TOTAL_ROUNDS - 1) * STACK_PEEK) / 2;
+    const targetX   = CONTAINER_PAD + stackBase + idx * STACK_PEEK;
     const targetY = safeTopOffset + CONTAINER_PAD + 8;
 
     containerRef.current?.measure((_a, _b, _c, _d, cPx, cPy) => {

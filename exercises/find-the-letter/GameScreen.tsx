@@ -34,8 +34,9 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const hintOp   = fly.hintOp;
 
   const [rounds]      = useState<string[]>(() => selectLetters(TOTAL_ROUNDS));
+  const [allTiles]    = useState<string[][]>(() => rounds.map(pickTiles));
   const [roundIndex, setRoundIndex] = useState(0);
-  const [tiles, setTiles]           = useState<string[]>([]);
+  const tiles         = allTiles[roundIndex];
   const [errors, setErrors]         = useState(0);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
   const [showHint, setShowHint]     = useState(false);
@@ -61,7 +62,6 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     setWrongLetters([]);
     setShowHint(false);
     fly.resetWrongs();
-    setTiles(pickTiles(target));
     cancel();
     void playSequence([roundIndex === 0 ? MODULE_LABEL : FIND, LETTERS[target]]);
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -17,6 +17,7 @@ import {
   TOTAL_ROUNDS, WORD_KEYS, WORDS,
   pickTiles, selectGameLetters, type Outcome, type RoundResult, type WordEntry,
 } from './gameUtils';
+import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
 import { styles } from './game-styles';
 
 export type { Outcome, RoundResult };
@@ -153,7 +154,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
       <View style={[styles.content, { paddingTop: safeTop + CONTAINER_PAD }]}>
         <ImageFanZone items={collected} />
         <View style={styles.centerArea}>
-          <View ref={imageRef} style={[styles.illustration, fly.isFlyingImage && styles.hidden]}>
+          <View ref={imageRef} style={[styles.illustration, fly.isCorrect && { backgroundColor: CORRECT_BG, borderWidth: 2, borderColor: CORRECT_BORDER }, fly.isFlyingImage && styles.hidden]}>
             {currentEntry.image
               ? <Image source={currentEntry.image} style={styles.image} />
               : <View style={styles.imgPlaceholder} />}

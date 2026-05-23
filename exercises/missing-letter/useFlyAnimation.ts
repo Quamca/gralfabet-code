@@ -27,6 +27,7 @@ export interface FlyArgs {
 
 export function useFlyAnimation() {
   const [isFlyingImage, setIsFlyingImage] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
   const flyX       = useSharedValue(0);
   const flyY       = useSharedValue(0);
   const flyOpacity = useSharedValue(0);
@@ -54,6 +55,7 @@ export function useFlyAnimation() {
     const targetY   = safeTopOffset + CONTAINER_PAD + 8;
 
     setFilledLetter(letter);
+    setIsCorrect(true);
     void playSequence([DOBRZE]);
 
     setTimeout(() => {
@@ -77,6 +79,7 @@ export function useFlyAnimation() {
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
               if (done) {
                 runOnJS(setIsFlyingImage)(false);
+                runOnJS(setIsCorrect)(false);
                 runOnJS(advance)();
               }
             });
@@ -86,5 +89,5 @@ export function useFlyAnimation() {
     }, REVEAL_STABLE_MS);
   }
 
-  return { isFlyingImage, flyStyle, tilesOp, hintOp, resetWrongs, dropWrongs, dropHint, startFly };
+  return { isFlyingImage, isCorrect, flyStyle, tilesOp, hintOp, resetWrongs, dropWrongs, dropHint, startFly };
 }

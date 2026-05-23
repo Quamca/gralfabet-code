@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
 import { CONTAINER_PAD, TILE_H, TILE_W } from './gameUtils';
 
 export const styles = StyleSheet.create({
@@ -17,7 +18,7 @@ export const styles = StyleSheet.create({
   tileUpper:      { fontSize: 48, fontWeight: 'bold', color: '#333' },
   tileLower:      { fontSize: 24, color: '#666', marginTop: 4 },
   exitIcon:       { width: 80, height: 80, resizeMode: 'contain' },
-  flyCard:    { position: 'absolute', zIndex: 999, width: 100, height: 100, alignItems: 'center', justifyContent: 'center' },
-  flyImage:   { width: 100, height: 100, resizeMode: 'contain' },
+  flyCard:    { position: 'absolute', zIndex: 999, width: 100, height: 100, backgroundColor: CORRECT_BG, borderRadius: 12, borderWidth: 2, borderColor: CORRECT_BORDER, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
+  flyImage:   { width: 92, height: 92, resizeMode: 'contain' },
   flySymbol:  { fontSize: 64, fontWeight: 'bold', color: '#555' },
 });

@@ -163,7 +163,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
             onPress={() => {
               if (canRepeat) {
                 const key = currentEntry.gapIndex === 0 ? `jak-${currentEntry.word}` : `w-słowie-${currentEntry.word}`;
-                void playSequence(roundIndex === 0 ? [FIND, LETTERS[target], WORD_CONTEXT[key]] : [LETTERS[target], WORD_CONTEXT[key]]);
+                void playSequence([LETTERS[target], WORD_CONTEXT[key]]);
               }
             }}
             disabled={!canRepeat}

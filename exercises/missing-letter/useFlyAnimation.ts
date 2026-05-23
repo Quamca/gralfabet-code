@@ -77,12 +77,9 @@ export function useFlyAnimation() {
 
           setTimeout(() => {
             setCollected((prev) => [...prev, newItem]);
+            const onFlyDone = () => { setIsFlyingImage(false); setIsCorrect(false); advance(); };
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
-              if (done) {
-                runOnJS(setIsFlyingImage)(false);
-                runOnJS(setIsCorrect)(false);
-                runOnJS(advance)();
-              }
+              if (done) runOnJS(onFlyDone)();
             });
           }, FLY_DURATION_MS);
         });

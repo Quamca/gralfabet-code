@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   card:         { backgroundColor: CORRECT_BG, borderRadius: 16, paddingVertical: 16, paddingHorizontal: 16, alignItems: 'center', borderWidth: 2, borderColor: CORRECT_BORDER, minWidth: '42%' },
   cardImg:      { width: 140, height: 140, resizeMode: 'contain' },
   placeholder:  { width: 140, height: 140, backgroundColor: '#B0BEC5', borderRadius: 8 },
-  label:        { fontSize: 24, fontWeight: 'bold', color: '#333', marginTop: 10 },
+  label:        { fontSize: 32, fontWeight: 'bold', color: '#333', marginTop: 10 },
   emptySection: { alignItems: 'center' },
   emptyText:    { fontSize: 24, color: '#888', textAlign: 'center', marginBottom: 8 },
   playAgainGap: { marginTop: 16 },

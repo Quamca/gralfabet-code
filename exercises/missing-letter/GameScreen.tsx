@@ -38,7 +38,9 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const [rounds]     = useState<string[]>(() => selectGameLetters(TOTAL_ROUNDS));
   const [allEntries] = useState<WordEntry[]>(() => rounds.map((l) => {
     const pool = WORDS[l] ?? [];
-    return pool[Math.floor(Math.random() * pool.length)] ?? { word: l, gapIndex: 0, image: null };
+    const withImg = pool.filter(e => e.image !== null);
+    const source = withImg.length > 0 ? withImg : pool;
+    return source[Math.floor(Math.random() * source.length)] ?? { word: l, gapIndex: 0, image: null };
   }));
   const [allTiles]   = useState<string[][]>(() => rounds.map((l) => pickTiles(l, WORD_KEYS)));
   const [roundIndex, setRoundIndex]     = useState(0);

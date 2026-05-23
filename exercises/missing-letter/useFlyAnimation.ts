@@ -41,6 +41,7 @@ export function useFlyAnimation() {
   }));
 
   function resetWrongs() { tilesOp.value = 1; hintOp.value = 1; }
+  function resetFly() { setIsFlyingImage(false); setIsCorrect(false); flyOpacity.value = 0; }
   function dropWrongs() { tilesOp.value = withTiming(0, { duration: 400 }); }
   function dropHint() { hintOp.value = withTiming(0, { duration: FADE_OUT_MS }); }
 
@@ -89,5 +90,5 @@ export function useFlyAnimation() {
     }, REVEAL_STABLE_MS);
   }
 
-  return { isFlyingImage, isCorrect, flyStyle, tilesOp, hintOp, resetWrongs, dropWrongs, dropHint, startFly };
+  return { isFlyingImage, isCorrect, flyStyle, tilesOp, hintOp, resetWrongs, resetFly, dropWrongs, dropHint, startFly };
 }

@@ -77,6 +77,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     setShowHint(false);
     setFilledLetter(null);
     fly.resetWrongs();
+    fly.resetFly();
     cancel();
     const entry  = allEntries[roundIndex];
     const target = rounds[roundIndex];

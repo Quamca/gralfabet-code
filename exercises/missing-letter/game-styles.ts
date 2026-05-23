@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
   container:      { flex: 1, backgroundColor: '#FFFDE7' },
   content:        { flex: 1, padding: CONTAINER_PAD },
   centerArea:     { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  illustration:   { width: 180, height: 180, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  illustration:   { width: 180, height: 180, borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', marginBottom: 8, backgroundColor: '#FFFFFF' },
   hidden:         { opacity: 0 },
   image:          { width: 160, height: 160, resizeMode: 'contain' },
   imgPlaceholder: { width: 160, height: 160, backgroundColor: '#E0E0E0', borderRadius: 12 },

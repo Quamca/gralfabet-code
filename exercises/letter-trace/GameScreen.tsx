@@ -22,27 +22,32 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const [roundLetters]    = useState(() => sampleLetters(ROUNDS_PER_SESSION));
   const [roundIndex, setRoundIndex] = useState(0);
 
-  const font        = useMemo(() => matchFont({ fontSize: LETTER_FONT_SIZE, fontWeight: 'bold' }), []);
+  // 'sans-serif' is a valid Android font family; default 'System' returns null on Android
+  const font        = useMemo(() => matchFont({ fontFamily: 'sans-serif', fontSize: LETTER_FONT_SIZE }), []);
   const canvasSize  = Math.min(width, height) * 0.75;
   const currentEntry = roundLetters[roundIndex];
 
+  // Baseline hard-coded at 78% of canvas — measureText y is unreliable on Android when typeface is null
+  const letterY = canvasSize * 0.78;
+
   const letterPos = useMemo(() => {
-    if (!font) return { x: canvasSize / 2, y: canvasSize * 0.6 };
+    if (!font) return { x: canvasSize * 0.1, y: letterY };
     const b = font.measureText(currentEntry.letter);
-    return {
-      x: canvasSize / 2 - b.x - b.width / 2,
-      y: canvasSize / 2 - b.y - b.height / 2,
-    };
-  }, [font, currentEntry.letter, canvasSize]);
+    const x = b.width > 0
+      ? canvasSize / 2 - b.x - b.width / 2
+      : canvasSize * 0.1;
+    return { x, y: letterY };
+  }, [font, currentEntry.letter, canvasSize, letterY]);
 
   const startPoint = useMemo(() => {
-    if (!font) return { x: canvasSize / 2, y: canvasSize * 0.25 };
+    if (!font) return { x: canvasSize * 0.2, y: letterY - LETTER_FONT_SIZE * 0.8 };
     const b = font.measureText(currentEntry.letter);
+    const safeWidth = b.width > 0 ? b.width : LETTER_FONT_SIZE * 0.6;
     return {
-      x: letterPos.x + b.x + b.width * 0.2,
-      y: letterPos.y + b.y + b.height * 0.05,
+      x: letterPos.x + safeWidth * 0.2,
+      y: letterY - LETTER_FONT_SIZE * 0.8,
     };
-  }, [font, currentEntry.letter, canvasSize, letterPos]);
+  }, [font, currentEntry.letter, canvasSize, letterPos, letterY]);
 
   function handleNext() {
     if (roundIndex < ROUNDS_PER_SESSION - 1) {

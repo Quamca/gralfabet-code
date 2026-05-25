@@ -5,6 +5,6 @@ export interface ExerciseModule {
   name: string;
   icon: ImageSourcePropType;
   component: React.ComponentType;
-  audioLabel: number;
+  audioLabel?: number;
   tileColor?: string;
 }

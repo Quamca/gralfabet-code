@@ -12,7 +12,7 @@ export const { width: SCREEN_W } = Dimensions.get('window');
 export const TILE_GAP   = 16;
 export const TILE_W     = Math.floor((SCREEN_W - CONTAINER_PAD * 2 - TILE_GAP) / 2);
 export const TILE_H     = 140;
-export const IMAGE_SIZE = 100;
+export const IMAGE_SIZE = 150;
 export const FAN_W      = SCREEN_W - CONTAINER_PAD * 2;
 export const STACK_PEEK = 12;
 

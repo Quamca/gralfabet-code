@@ -1,7 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
-
+import { StyleSheet, Text } from 'react-native';
+import { CORRECT_BORDER } from '../shared/tokens';
 
 interface Props {
   word: string;
@@ -10,33 +9,21 @@ interface Props {
 }
 
 export function WordDisplay({ word, gapIndex, filledLetter }: Props): React.ReactElement {
-  const before = gapIndex === 0
-    ? ''
-    : word[0].toUpperCase() + word.slice(1, gapIndex).toLowerCase();
-  const after  = word.slice(gapIndex + 1).toLowerCase();
-  const isFirst = gapIndex === 0;
+  const chars = word.split('').map((char, i) => {
+    if (i === gapIndex) {
+      if (filledLetter !== null) {
+        const letter = gapIndex === 0 ? filledLetter.toUpperCase() : filledLetter;
+        return <Text key={i} style={styles.filled}>{letter}</Text>;
+      }
+      return <Text key={i}>{'_'}</Text>;
+    }
+    return <Text key={i}>{i === 0 ? char.toUpperCase() : char}</Text>;
+  });
 
-  return (
-    <View style={styles.row}>
-      {before.length > 0 && <Text style={styles.letter}>{before}</Text>}
-      <View style={styles.gap}>
-        {filledLetter ? (
-          <Animated.Text entering={ZoomIn.duration(250)} style={styles.filled}>
-            {isFirst ? filledLetter.toUpperCase() : filledLetter.toLowerCase()}
-          </Animated.Text>
-        ) : (
-          <Text style={styles.blank}>_</Text>
-        )}
-      </View>
-      {after.length > 0 && <Text style={styles.letter}>{after}</Text>}
-    </View>
-  );
+  return <Text style={styles.word}>{chars}</Text>;
 }
 
 const styles = StyleSheet.create({
-  row:    { flexDirection: 'row', alignItems: 'center', marginTop: 16 },
-  letter: { fontSize: 56, fontWeight: 'bold', color: '#333' },
-  gap:    { alignItems: 'center', justifyContent: 'center', marginHorizontal: 2 },
-  filled: { fontSize: 56, fontWeight: 'bold', color: '#2E7D32' },
-  blank:  { fontSize: 56, fontWeight: 'bold', color: '#BDBDBD' },
+  word:   { fontSize: 48, fontWeight: 'bold', color: '#333', letterSpacing: 4, marginVertical: 12 },
+  filled: { color: CORRECT_BORDER },
 });

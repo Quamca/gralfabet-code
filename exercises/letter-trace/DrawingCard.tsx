@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Canvas, Path as SkiaPath, Skia } from '@shopify/react-native-skia';
-import type { CollectedDrawing } from './useRoundState';
+import type { CollectedDrawing, StrokePoint } from './useRoundState';
 
 interface Props {
   drawing: CollectedDrawing;
@@ -10,16 +10,22 @@ interface Props {
 export function DrawingCard({ drawing, size }: Props): React.ReactElement {
   const path = useMemo(() => {
     const pts = drawing.strokePoints;
-    if (pts.length < 2) return null;
+    if (pts.length === 0) return null;
     const scale = size / drawing.canvasSize;
     const p = Skia.Path.Make();
-    let started = false;
+    const segs: StrokePoint[][] = [];
+    let cur: StrokePoint[] = [];
     for (const pt of pts) {
-      if (pt.newStroke || !started) {
-        p.moveTo(pt.x * scale, pt.y * scale);
-        started = true;
+      if (pt.newStroke && cur.length > 0) { segs.push(cur); cur = []; }
+      cur.push(pt);
+    }
+    if (cur.length > 0) segs.push(cur);
+    for (const seg of segs) {
+      if (seg.length === 1) {
+        p.addCircle(seg[0].x * scale, seg[0].y * scale, 11 * scale);
       } else {
-        p.lineTo(pt.x * scale, pt.y * scale);
+        p.moveTo(seg[0].x * scale, seg[0].y * scale);
+        for (let i = 1; i < seg.length; i++) p.lineTo(seg[i].x * scale, seg[i].y * scale);
       }
     }
     return p;

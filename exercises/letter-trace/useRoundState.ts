@@ -32,6 +32,7 @@ export interface RoundStateReturn extends RoundRefs {
   onBeginStroke: (x: number, y: number) => void;
   onPoint:       (x: number, y: number) => void;
   onStrokeEnd:   () => void;
+  clearStroke:   () => void;
 }
 
 const ROUNDS_PER_SESSION = 5;
@@ -104,6 +105,16 @@ export function useRoundState(
     if (phaseRef.current === 'success' || phaseRef.current === 'revealed') return;
     if (failLockRef.current) return;
     strokeRef.current = [...strokeRef.current, { x, y, newStroke: true }];
+    const path = letterPathRef.current;
+    const grid = letterGridRef.current;
+    if (path) {
+      if (path.contains(x, y)) {
+        insideRef.current++;
+        markCoveredCells(coveredRef.current, grid, x, y);
+      } else {
+        outsideRef.current++;
+      }
+    }
     phaseRef.current = 'drawing';
     setRenderTick(t => t + 1);
   }
@@ -141,9 +152,16 @@ export function useRoundState(
     }
   }
 
+  function clearStroke() {
+    if (phaseRef.current !== 'idle' && phaseRef.current !== 'drawing') return;
+    resetStroke();
+    phaseRef.current = 'idle';
+    setPhase('idle');
+  }
+
   return {
     roundIndex, phase, renderTick,
     strokeRef, letterPathRef, letterGridRef,
-    onBeginStroke, onPoint, onStrokeEnd,
+    onBeginStroke, onPoint, onStrokeEnd, clearStroke,
   };
 }

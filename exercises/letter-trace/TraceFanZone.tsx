@@ -4,7 +4,7 @@ import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
 import type { CollectedDrawing } from './useRoundState';
 import { DrawingCard } from './DrawingCard';
 
-export const TRACE_CARD_SIZE  = 140;
+export const TRACE_CARD_SIZE  = 180;
 export const TRACE_STACK_PEEK = 12;
 export const TRACE_ROUNDS     = 5;
 

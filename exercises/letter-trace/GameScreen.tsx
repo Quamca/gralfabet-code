@@ -1,7 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-reanimated';
+import {
+  runOnJS,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   Canvas,
   Circle,
@@ -11,19 +17,17 @@ import {
   matchFont,
 } from '@shopify/react-native-skia';
 import { SCREEN_BG } from '../shared/tokens';
-import { LETTERS, type LetterEntry } from './letter-data';
+import { selectLetterEntries } from './letter-data';
+import { getPromptAudio } from './audio-assets';
 import { buildLetterGrid } from './letter-trace-utils';
 import { useRoundState, type Phase, type RoundOutcome } from './useRoundState';
+import { useAudioSequence } from '../../hooks/useAudioSequence';
 
 export type { RoundOutcome };
 
 const ROUNDS_PER_SESSION = 5;
 const LETTER_FONT_SIZE   = 200;
 const START_POINT_RADIUS = 14;
-
-function sampleLetters(count: number): LetterEntry[] {
-  return [...LETTERS].sort(() => Math.random() - 0.5).slice(0, count);
-}
 
 interface Props {
   onComplete: (outcomes: RoundOutcome[]) => void;
@@ -40,9 +44,33 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     []
   );
 
-  const [roundLetters] = React.useState(() => sampleLetters(ROUNDS_PER_SESSION));
+  const [roundLetters] = React.useState(() => selectLetterEntries(ROUNDS_PER_SESSION));
   const { roundIndex, phase, failCount, renderTick, strokeRef,
           letterPathRef, letterGridRef, onPoint, onStrokeEnd } = useRoundState(onComplete);
+
+  const { playSequence, cancel } = useAudioSequence();
+  const pulseRadius = useSharedValue(START_POINT_RADIUS);
+
+  useEffect(() => {
+    const entry = roundLetters[roundIndex];
+    void playSequence([getPromptAudio(entry)]);
+    return () => { cancel(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roundIndex]);
+
+  useEffect(() => {
+    if (phase === 'idle') {
+      pulseRadius.value = withRepeat(
+        withSequence(
+          withTiming(START_POINT_RADIUS + 6, { duration: 600 }),
+          withTiming(START_POINT_RADIUS,     { duration: 600 }),
+        ),
+        -1,
+      );
+    } else {
+      pulseRadius.value = withTiming(START_POINT_RADIUS, { duration: 100 });
+    }
+  }, [phase, pulseRadius]);
 
   const currentEntry = roundLetters[roundIndex];
 
@@ -126,7 +154,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
           <Circle
             cx={startPoint.x}
             cy={startPoint.y}
-            r={START_POINT_RADIUS}
+            r={pulseRadius}
             color={phase === 'idle' ? '#E74C3C' : 'transparent'}
           />
         </Canvas>

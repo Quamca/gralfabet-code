@@ -1,55 +1,119 @@
-import React, { useEffect, useMemo } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Image, StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import {
-  runOnJS,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
+import Animated, {
+  runOnJS, useAnimatedStyle, useSharedValue, withTiming,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Canvas,
-  Circle,
-  Path as SkiaPath,
-  Skia,
-  Text as SkiaText,
-  matchFont,
+  Canvas, Path as SkiaPath, Rect, Skia,
+  Text as SkiaText, matchFont,
 } from '@shopify/react-native-skia';
-import { SCREEN_BG } from '../shared/tokens';
+import { CONTAINER_PAD, CORRECT_BG, SCREEN_BG } from '../shared/tokens';
+import { FLY_DURATION_MS, FLY_FADE_MS } from '../shared/timings';
 import { selectLetterEntries } from './letter-data';
-import { getPromptAudio } from './audio-assets';
+import { getPromptAudio, TRY_AGAIN } from './audio-assets';
 import { buildLetterGrid } from './letter-trace-utils';
-import { useRoundState, type Phase, type RoundOutcome } from './useRoundState';
+import {
+  useRoundState,
+  type CollectedDrawing,
+  type Phase,
+  type RoundOutcome,
+  type StrokePoint,
+} from './useRoundState';
 import { useAudioSequence } from '../../hooks/useAudioSequence';
+import {
+  TraceFanZone,
+  TRACE_CARD_SIZE,
+  TRACE_STACK_PEEK,
+  TRACE_ROUNDS,
+  getTraceStackBase,
+} from './TraceFanZone';
+import { DrawingCard } from './DrawingCard';
 
-export type { RoundOutcome };
+export type { RoundOutcome, CollectedDrawing };
 
-const ROUNDS_PER_SESSION = 5;
-const LETTER_FONT_SIZE   = 200;
-const START_POINT_RADIUS = 14;
+const ROUNDS    = TRACE_ROUNDS;
+const EXIT_ICON = require('../../assets/images/shared/exit-button.png') as number;
+const DOBRZE    = require('../../assets/sounds/shared/phrases/dobrze.mp3') as number;
 
 interface Props {
-  onComplete: (outcomes: RoundOutcome[]) => void;
+  onComplete: (drawings: CollectedDrawing[]) => void;
   onExit:     () => void;
 }
 
 export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
-  const { width, height } = useWindowDimensions();
-  const canvasSize        = Math.min(width, height) * 0.75;
-  const letterY           = canvasSize * 0.78;
+  const { width }        = useWindowDimensions();
+  const { top: safeTop } = useSafeAreaInsets();
+  const canvasSize       = Math.round(width * 0.92);
+  const fontSz           = Math.round(canvasSize * 0.75);
+  const letterY          = Math.round(canvasSize * 0.88);
 
-  const font = useMemo(
-    () => matchFont({ fontFamily: 'sans-serif', fontSize: LETTER_FONT_SIZE }),
-    []
-  );
+  const font = useMemo(() => matchFont({ fontFamily: 'sans-serif', fontSize: fontSz, fontWeight: 'bold' }), [fontSz]);
 
-  const [roundLetters] = React.useState(() => selectLetterEntries(ROUNDS_PER_SESSION));
-  const { roundIndex, phase, failCount, renderTick, strokeRef,
-          letterPathRef, letterGridRef, onPoint, onStrokeEnd } = useRoundState(onComplete);
+  const containerRef  = useRef<View>(null);
+  const canvasViewRef = useRef<View>(null);
+  const fanZoneRef    = useRef<View>(null);
+
+  const [roundLetters]     = useState(() => selectLetterEntries(ROUNDS));
+  const [collectedDrawings, setCollectedDrawings] = useState<CollectedDrawing[]>([]);
+  const [flyDrawing,        setFlyDrawing]        = useState<CollectedDrawing | null>(null);
+  const collectedRef = useRef<CollectedDrawing[]>([]);
+
+  const flyX       = useSharedValue(0);
+  const flyY       = useSharedValue(0);
+  const flyOpacity = useSharedValue(0);
+  const flyStyle   = useAnimatedStyle(() => ({
+    left: flyX.value, top: flyY.value, opacity: flyOpacity.value,
+  }));
 
   const { playSequence, cancel } = useAudioSequence();
-  const pulseRadius = useSharedValue(START_POINT_RADIUS);
+
+  const handleRoundSuccess = useCallback((
+    roundIdx: number,
+    points:   ReadonlyArray<StrokePoint>,
+  ) => {
+    const entry    = roundLetters[roundIdx];
+    const drawing: CollectedDrawing = { letter: entry.letter, strokePoints: points, canvasSize };
+    const idx      = collectedRef.current.length;
+    collectedRef.current = [...collectedRef.current, drawing];
+    setCollectedDrawings([...collectedRef.current]);
+    setFlyDrawing(drawing);
+    void playSequence([DOBRZE]);
+
+    const stackBase = getTraceStackBase(canvasSize);
+
+    setTimeout(() => {
+      containerRef.current?.measure((_a, _b, _c, _d, cPx, cPy) => {
+        canvasViewRef.current?.measure((_a, _b, _c, _d, vPx, vPy) => {
+          fanZoneRef.current?.measure((_a, _b, _c, _d, fPx, fPy) => {
+            flyX.value       = vPx - cPx + canvasSize / 2 - TRACE_CARD_SIZE / 2;
+            flyY.value       = vPy - cPy + canvasSize / 2 - TRACE_CARD_SIZE / 2;
+            flyOpacity.value = 1;
+
+            flyX.value = withTiming(fPx - cPx + stackBase + idx * TRACE_STACK_PEEK, { duration: FLY_DURATION_MS });
+            flyY.value = withTiming(fPy - cPy + 8,                                  { duration: FLY_DURATION_MS });
+
+            setTimeout(() => {
+              flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
+                if (done) runOnJS(setFlyDrawing)(null);
+              });
+            }, FLY_DURATION_MS);
+          });
+        });
+      });
+    }, 100);
+  }, [roundLetters, canvasSize, playSequence, flyX, flyY, flyOpacity]);
+
+  const { roundIndex, phase, renderTick,
+          strokeRef, letterPathRef, letterGridRef, onBeginStroke, onPoint, onStrokeEnd } =
+    useRoundState(
+      (_outcomes) => onComplete(collectedRef.current),
+      {
+        onRoundSuccess: handleRoundSuccess,
+        onFail: () => { void playSequence([TRY_AGAIN]); },
+      },
+    );
 
   useEffect(() => {
     const entry = roundLetters[roundIndex];
@@ -58,31 +122,12 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundIndex]);
 
-  useEffect(() => {
-    if (phase === 'idle') {
-      pulseRadius.value = withRepeat(
-        withSequence(
-          withTiming(START_POINT_RADIUS + 6, { duration: 600 }),
-          withTiming(START_POINT_RADIUS,     { duration: 600 }),
-        ),
-        -1,
-      );
-    } else {
-      pulseRadius.value = withTiming(START_POINT_RADIUS, { duration: 100 });
-    }
-  }, [phase, pulseRadius]);
-
   const currentEntry = roundLetters[roundIndex];
 
-  const { letterX, startPoint } = useMemo(() => {
+  const { letterX } = useMemo(() => {
     letterPathRef.current = null;
     letterGridRef.current = [];
-    if (!font) {
-      return {
-        letterX:    canvasSize * 0.1,
-        startPoint: { x: canvasSize * 0.2, y: letterY - LETTER_FONT_SIZE * 0.8 },
-      };
-    }
+    if (!font) return { letterX: canvasSize * 0.1 };
     const b    = font.measureText(currentEntry.letter);
     const lx   = b.width > 0 ? canvasSize / 2 - b.x - b.width / 2 : canvasSize * 0.1;
     const path = Skia.Path.MakeFromText(currentEntry.letter, lx, letterY, font);
@@ -90,23 +135,14 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     letterGridRef.current = path
       ? buildLetterGrid(
           (gx, gy) => path.contains(gx, gy),
-          lx + b.x,
-          letterY + b.y,
-          b.width,
-          Math.abs(b.y) + b.height,
+          lx + b.x, letterY + b.y, b.width, Math.abs(b.y) + b.height,
         )
       : [];
-    return {
-      letterX:    lx,
-      startPoint: {
-        x: lx + (b.width > 0 ? b.x + b.width * 0.2 : LETTER_FONT_SIZE * 0.1),
-        y: letterY - LETTER_FONT_SIZE * 0.8,
-      },
-    };
+    return { letterX: lx };
   }, [font, currentEntry.letter, canvasSize, letterY, letterPathRef, letterGridRef]);
 
   const gesture = Gesture.Pan()
-    .onBegin((e) => { runOnJS(onPoint)(e.x, e.y); })
+    .onBegin((e) => { runOnJS(onBeginStroke)(e.x, e.y); })
     .onUpdate((e) => { runOnJS(onPoint)(e.x, e.y); })
     .onEnd(()    => { runOnJS(onStrokeEnd)(); });
 
@@ -114,56 +150,73 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     const pts = strokeRef.current;
     if (pts.length < 2) return null;
     const p = Skia.Path.Make();
-    p.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < pts.length; i++) p.lineTo(pts[i].x, pts[i].y);
+    let started = false;
+    for (const pt of pts) {
+      if (pt.newStroke || !started) {
+        p.moveTo(pt.x, pt.y);
+        started = true;
+      } else {
+        p.lineTo(pt.x, pt.y);
+      }
+    }
     return p;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [renderTick]);
 
   const strokeColor = phaseToStrokeColor(phase);
-  const feedbackMsg = phaseToFeedback(phase, failCount);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.round}>
-        Litera {roundIndex + 1} / {ROUNDS_PER_SESSION}
-        {failCount > 0 && phase === 'idle' ? `  (próba ${failCount + 1}/2)` : ''}
-      </Text>
-      {feedbackMsg ? <Text style={styles.feedback}>{feedbackMsg}</Text> : null}
-      <GestureDetector gesture={gesture}>
-        <Canvas style={{ width: canvasSize, height: canvasSize }}>
-          {font ? (
-            <SkiaText
-              text={currentEntry.letter}
-              x={letterX}
-              y={letterY}
-              font={font}
-              color={phase === 'success' ? '#43A047' : '#2C3E50'}
-            />
-          ) : null}
-          {strokePath ? (
-            <SkiaPath
-              path={strokePath}
-              color={strokeColor}
-              style="stroke"
-              strokeWidth={16}
-              strokeCap="round"
-              strokeJoin="round"
-            />
-          ) : null}
-          <Circle
-            cx={startPoint.x}
-            cy={startPoint.y}
-            r={pulseRadius}
-            color={phase === 'idle' ? '#E74C3C' : 'transparent'}
-          />
-        </Canvas>
-      </GestureDetector>
-      <View style={styles.buttons}>
-        <TouchableOpacity onPress={onExit} activeOpacity={0.7} style={styles.exitBtn}>
-          <Text style={styles.exitText}>Menu</Text>
+    <View ref={containerRef} style={styles.container}>
+      <View style={{ paddingTop: safeTop + 4 }}>
+        <TraceFanZone
+          ref={fanZoneRef}
+          drawings={collectedDrawings}
+          canvasWidth={canvasSize}
+        />
+      </View>
+
+      <View style={styles.canvasArea}>
+        <GestureDetector gesture={gesture}>
+          <View ref={canvasViewRef} style={styles.canvasBorder}>
+            <Canvas style={{ width: canvasSize, height: canvasSize }}>
+              {phase === 'success' && (
+                <Rect x={0} y={0} width={canvasSize} height={canvasSize} color={CORRECT_BG} />
+              )}
+              {font && (
+                <SkiaText
+                  text={currentEntry.letter}
+                  x={letterX}
+                  y={letterY}
+                  font={font}
+                  color={phase === 'success' ? '#43A047' : '#2C3E50'}
+                />
+              )}
+              {strokePath && (
+                <SkiaPath
+                  path={strokePath}
+                  color={strokeColor}
+                  style="stroke"
+                  strokeWidth={22}
+                  strokeCap="round"
+                  strokeJoin="round"
+                />
+              )}
+            </Canvas>
+          </View>
+        </GestureDetector>
+      </View>
+
+      <View style={styles.bottom}>
+        <TouchableOpacity onPress={onExit} activeOpacity={0.7}>
+          <Image source={EXIT_ICON} style={styles.exitIcon} />
         </TouchableOpacity>
       </View>
+
+      {flyDrawing !== null && (
+        <Animated.View style={[styles.flyCard, flyStyle]} pointerEvents="none">
+          <DrawingCard drawing={flyDrawing} size={TRACE_CARD_SIZE} />
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -174,18 +227,21 @@ function phaseToStrokeColor(phase: Phase): string {
   return '#2196F3';
 }
 
-function phaseToFeedback(phase: Phase, failCount: number): string {
-  if (phase === 'success')  return 'Świetnie!';
-  if (phase === 'revealed') return 'Spróbuj następną!';
-  if (failCount > 0)        return 'Spróbuj jeszcze raz!';
-  return '';
-}
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: SCREEN_BG, alignItems: 'center', justifyContent: 'center', padding: 20 },
-  round:     { fontSize: 20, color: '#666', marginBottom: 4 },
-  feedback:  { fontSize: 18, color: '#E57373', marginBottom: 8, fontWeight: 'bold' },
-  buttons:   { marginTop: 24 },
-  exitBtn:   { backgroundColor: '#90A4AE', paddingVertical: 14, paddingHorizontal: 32, borderRadius: 12 },
-  exitText:  { fontSize: 18, color: '#fff' },
+  container:    { flex: 1, backgroundColor: SCREEN_BG, alignItems: 'center' },
+  canvasArea:   { flex: 1, justifyContent: 'center' },
+  canvasBorder: { borderWidth: 1, borderColor: '#ccc' },
+  bottom:       { paddingBottom: 20, paddingTop: 8 },
+  exitIcon:     { width: 80, height: 80, resizeMode: 'contain' },
+  flyCard:   {
+    position:        'absolute',
+    width:           TRACE_CARD_SIZE,
+    height:          TRACE_CARD_SIZE,
+    borderRadius:    12,
+    overflow:        'hidden',
+    backgroundColor: CORRECT_BG,
+    borderWidth:     2,
+    borderColor:     '#43A047',
+    zIndex:          999,
+  },
 });

@@ -37,8 +37,7 @@ export function ResultScreen({ results, onPlayAgain, onExit }: Props): React.Rea
           </View>
         ) : (
           <View style={styles.emptySection}>
-            <Text style={styles.emptyText}>Spróbuj jeszcze raz!</Text>
-            <TouchableOpacity onPress={onPlayAgain} activeOpacity={0.7} style={styles.playAgainGap}>
+            <TouchableOpacity onPress={onPlayAgain} activeOpacity={0.7}>
               <Image source={PLAY_AGAIN_ICON} style={styles.btnIconLarge} />
             </TouchableOpacity>
           </View>
@@ -68,8 +67,6 @@ const styles = StyleSheet.create({
   cardUpper:    { fontSize: 48, fontWeight: 'bold', color: '#333' },
   cardLower:    { fontSize: 24, color: '#666', marginTop: 4 },
   emptySection: { alignItems: 'center' },
-  emptyText:    { fontSize: 24, color: '#888', textAlign: 'center', marginBottom: 8 },
-  playAgainGap: { marginTop: 16 },
   bottom:       { flexDirection: 'row', justifyContent: 'center', gap: 32, paddingVertical: 20 },
   btnIcon:      { width: 80, height: 80, resizeMode: 'contain' },
   btnIconLarge: { width: 112, height: 112, resizeMode: 'contain' },

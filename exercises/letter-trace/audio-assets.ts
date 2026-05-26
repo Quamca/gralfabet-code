@@ -77,3 +77,5 @@ const AUDIO: Record<string, Record<string, number>> = {
 export function getPromptAudio(entry: LetterEntry): number {
   return AUDIO[entry.caze][entry.audioKey];
 }
+
+export const TRY_AGAIN = require('../../assets/sounds/shared/phrases/try-again.mp3') as number;

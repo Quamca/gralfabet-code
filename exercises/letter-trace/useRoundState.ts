@@ -11,8 +11,13 @@ import {
 export type RoundOutcome = 'success' | 'auto-reveal';
 export type Phase = 'idle' | 'drawing' | 'success' | 'revealed';
 
-const ROUNDS_PER_SESSION = 5;
-const FAIL_LIMIT         = 2;
+export type StrokePoint = { x: number; y: number; newStroke?: boolean };
+
+export type CollectedDrawing = {
+  letter:       string;
+  strokePoints: ReadonlyArray<StrokePoint>;
+  canvasSize:   number;
+};
 
 export interface RoundRefs {
   letterPathRef: React.MutableRefObject<SkPath | null>;
@@ -20,32 +25,41 @@ export interface RoundRefs {
 }
 
 export interface RoundStateReturn extends RoundRefs {
-  roundIndex: number;
-  phase:      Phase;
-  failCount:  number;
-  renderTick: number;
-  strokeRef:  React.MutableRefObject<Array<{ x: number; y: number }>>;
-  onPoint:    (x: number, y: number) => void;
-  onStrokeEnd:() => void;
+  roundIndex:    number;
+  phase:         Phase;
+  renderTick:    number;
+  strokeRef:     React.MutableRefObject<StrokePoint[]>;
+  onBeginStroke: (x: number, y: number) => void;
+  onPoint:       (x: number, y: number) => void;
+  onStrokeEnd:   () => void;
 }
 
+const ROUNDS_PER_SESSION = 5;
+const FAIL_LIMIT         = 2;
+const FAIL_COOLDOWN_MS   = 1200;
+const SUCCESS_HOLD_MS    = 1700;
+
 export function useRoundState(
-  onComplete: (outcomes: RoundOutcome[]) => void
+  onComplete: (outcomes: RoundOutcome[]) => void,
+  options?: {
+    onRoundSuccess?: (roundIndex: number, points: ReadonlyArray<StrokePoint>) => void;
+    onFail?: () => void;
+  },
 ): RoundStateReturn {
-  const roundIndexRef  = useRef(0);
-  const phaseRef       = useRef<Phase>('idle');
-  const failCountRef   = useRef(0);
-  const outcomesRef    = useRef<RoundOutcome[]>([]);
-  const insideRef      = useRef(0);
-  const outsideRef     = useRef(0);
-  const coveredRef     = useRef(new Set<number>());
-  const strokeRef      = useRef<Array<{ x: number; y: number }>>([]);
-  const letterPathRef  = useRef<SkPath | null>(null);
-  const letterGridRef  = useRef<GridPoint[]>([]);
+  const roundIndexRef = useRef(0);
+  const phaseRef      = useRef<Phase>('idle');
+  const failCountRef  = useRef(0);
+  const outcomesRef   = useRef<RoundOutcome[]>([]);
+  const insideRef     = useRef(0);
+  const outsideRef    = useRef(0);
+  const coveredRef    = useRef(new Set<number>());
+  const strokeRef     = useRef<StrokePoint[]>([]);
+  const letterPathRef = useRef<SkPath | null>(null);
+  const letterGridRef = useRef<GridPoint[]>([]);
+  const failLockRef   = useRef(false);
 
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase,      setPhase]      = useState<Phase>('idle');
-  const [failCount,  setFailCount]  = useState(0);
   const [renderTick, setRenderTick] = useState(0);
 
   function resetStroke() {
@@ -63,7 +77,6 @@ export function useRoundState(
     failCountRef.current  = 0;
     phaseRef.current      = 'idle';
     setRoundIndex(next);
-    setFailCount(0);
     setPhase('idle');
     resetStroke();
   }
@@ -78,15 +91,26 @@ export function useRoundState(
       outcomesRef.current = next;
       setTimeout(() => advanceRound(next), 1500);
     } else {
+      options?.onFail?.();
       phaseRef.current = 'idle';
-      setFailCount(newFail);
       setPhase('idle');
       resetStroke();
+      failLockRef.current = true;
+      setTimeout(() => { failLockRef.current = false; }, FAIL_COOLDOWN_MS);
     }
+  }
+
+  function onBeginStroke(x: number, y: number) {
+    if (phaseRef.current === 'success' || phaseRef.current === 'revealed') return;
+    if (failLockRef.current) return;
+    strokeRef.current = [...strokeRef.current, { x, y, newStroke: true }];
+    phaseRef.current = 'drawing';
+    setRenderTick(t => t + 1);
   }
 
   function onPoint(x: number, y: number) {
     if (phaseRef.current === 'success' || phaseRef.current === 'revealed') return;
+    if (failLockRef.current) return;
     strokeRef.current = [...strokeRef.current, { x, y }];
     const path = letterPathRef.current;
     const grid = letterGridRef.current;
@@ -112,13 +136,14 @@ export function useRoundState(
       setPhase('success');
       const next = [...outcomesRef.current, 'success' as RoundOutcome];
       outcomesRef.current = next;
-      setTimeout(() => advanceRound(next), 900);
+      options?.onRoundSuccess?.(roundIndexRef.current, [...strokeRef.current]);
+      setTimeout(() => advanceRound(next), SUCCESS_HOLD_MS);
     }
   }
 
   return {
-    roundIndex, phase, failCount, renderTick,
+    roundIndex, phase, renderTick,
     strokeRef, letterPathRef, letterGridRef,
-    onPoint, onStrokeEnd,
+    onBeginStroke, onPoint, onStrokeEnd,
   };
 }

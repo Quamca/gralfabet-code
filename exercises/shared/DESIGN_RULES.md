@@ -51,8 +51,9 @@ Tap wrong 2 → tiles fade to 0.3 + hint shows (green, pulsing)
 - **Fan zone:** top of content area, items stacked with STACK_PEEK offset
 - **Replay button:** centered, above tile grid, `marginBottom: 16`
 - **Tile grid:** 2 columns, 16px gap, centered horizontally
-- **Exit button:** bottom of screen, always visible
+- **Exit button:** bottom of screen, always visible — `<Image source={EXIT_ICON}>`, never a text button
 - **Safe area:** `useSafeAreaInsets()` offsets content from status bar
+- **No round counter** — modules use audio-only round cueing; "Litera X / N" text must not appear
 
 ## Calm UX Principles
 

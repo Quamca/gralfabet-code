@@ -1,18 +1,18 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { type ExerciseModule } from '../types';
-import { GameScreen, type RoundOutcome } from './GameScreen';
+import { GameScreen, type CollectedDrawing } from './GameScreen';
 import { ResultScreen } from './ResultScreen';
 
 function LetterTraceModule(): React.ReactElement {
   const router   = useRouter();
-  const [phase,   setPhase]    = useState<'playing' | 'result'>('playing');
-  const [outcomes, setOutcomes] = useState<RoundOutcome[]>([]);
+  const [phase,    setPhase]    = useState<'playing' | 'result'>('playing');
+  const [drawings, setDrawings] = useState<CollectedDrawing[]>([]);
 
   if (phase === 'playing') {
     return (
       <GameScreen
-        onComplete={(o) => { setOutcomes(o); setPhase('result'); }}
+        onComplete={(d) => { setDrawings(d); setPhase('result'); }}
         onExit={() => router.back()}
       />
     );
@@ -20,8 +20,8 @@ function LetterTraceModule(): React.ReactElement {
 
   return (
     <ResultScreen
-      outcomes={outcomes}
-      onPlayAgain={() => { setOutcomes([]); setPhase('playing'); }}
+      drawings={drawings}
+      onPlayAgain={() => { setDrawings([]); setPhase('playing'); }}
       onExit={() => router.back()}
     />
   );

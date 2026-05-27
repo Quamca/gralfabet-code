@@ -61,7 +61,7 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => router.replace('/')} accessibilityLabel="Wróć do menu">
+      <TouchableOpacity onPress={() => router.push('/')} accessibilityLabel="Wróć do menu">
         <Image source={EXIT_ICON} style={styles.homeBtn} />
       </TouchableOpacity>
     </View>

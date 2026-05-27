@@ -17,7 +17,7 @@ export default function ScoreScreen() {
         <Text style={styles.subtitle}>Tutaj wkrótce pojawią się{'\n'}osiągnięcia i statystyki</Text>
       </View>
 
-      <TouchableOpacity onPress={() => router.replace('/')} accessibilityLabel="Wróć do menu">
+      <TouchableOpacity onPress={() => router.push('/')} accessibilityLabel="Wróć do menu">
         <Image source={EXIT_ICON} style={styles.homeBtn} />
       </TouchableOpacity>
     </View>

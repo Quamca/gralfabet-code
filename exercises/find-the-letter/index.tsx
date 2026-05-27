@@ -13,7 +13,7 @@ function FindTheLetterModule(): React.ReactElement {
     return (
       <GameScreen
         onComplete={(r) => { setResults(r); setPhase('result'); }}
-        onExit={() => router.back()}
+        onExit={() => router.push({ pathname: '/', params: { exit: '1' } })}
       />
     );
   }
@@ -22,7 +22,7 @@ function FindTheLetterModule(): React.ReactElement {
     <ResultScreen
       results={results}
       onPlayAgain={() => { setResults([]); setPhase('playing'); }}
-      onExit={() => router.back()}
+      onExit={() => router.push({ pathname: '/', params: { exit: '1' } })}
     />
   );
 }

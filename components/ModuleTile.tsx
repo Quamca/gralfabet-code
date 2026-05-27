@@ -11,7 +11,7 @@ interface Props {
 
 export function ModuleTile({ module, size = DEFAULT_TILE_SIZE }: Props) {
   const router = useRouter();
-  const iconSize = Math.round(size * 0.65);
+  const iconSize = Math.round(size * 0.9);
 
   const handlePress = () => {
     router.push(`/exercise/${module.id}`);

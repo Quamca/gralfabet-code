@@ -1,11 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store/useAppStore';
 
 const EXIT_ICON = require('../assets/images/shared/exit-button.png') as number;
-const BG        = require('../assets/images/shared/home-background-right.png') as number;
 
 export default function SettingsScreen() {
   const childName    = useAppStore((s) => s.childName);
@@ -27,7 +26,6 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
     <View style={[styles.container, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
       <View style={styles.content}>
         <Text style={styles.title}>Ustawienia</Text>
@@ -65,12 +63,10 @@ export default function SettingsScreen() {
         <Image source={EXIT_ICON} style={styles.homeBtn} />
       </TouchableOpacity>
     </View>
-    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: { flex: 1 },
   container: {
     flex: 1,
     alignItems: 'center',

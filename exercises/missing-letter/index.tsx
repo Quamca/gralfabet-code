@@ -15,7 +15,7 @@ function MissingLetterModule(): React.ReactElement {
     return (
       <GameScreen
         onComplete={(_results, c) => { setCollected(c); setPhase('result'); }}
-        onExit={() => router.push('/')}
+        onExit={() => router.push({ pathname: '/', params: { exit: '1' } })}
       />
     );
   }
@@ -24,7 +24,7 @@ function MissingLetterModule(): React.ReactElement {
     <ResultScreen
       collected={collected}
       onPlayAgain={() => { setCollected([]); setPhase('playing'); }}
-      onExit={() => router.push('/')}
+      onExit={() => router.push({ pathname: '/', params: { exit: '1' } })}
     />
   );
 }

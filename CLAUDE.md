@@ -2,6 +2,21 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Workflow
+
+Issues are worked one at a time in order. For each issue:
+
+1. Create a feature branch from `develop`
+2. Implement, then `npx tsc --noEmit` — fix all errors before committing
+3. Commit and push, open a PR against `develop`
+4. **Wait for the user to say "zatwierdzam"** (or equivalent approval) before merging
+5. On approval: merge PR with `--delete-branch`, pull `develop`, proceed to the next issue
+6. Update `gralfabet-vault/00_START_HERE/CURRENT_STATE.md` when a sprint closes
+
+**Git autonomy**: once the user approves ("zatwierdzam"), merge and continue without further confirmation. Do not ask again for the same action within the same issue.
+
+**WIP rule**: if a file is modified but uncommitted at session start, check whether it belongs to a planned issue before creating a new branch — it may be unfinished work that just needs a commit.
+
 ## Commands
 
 ```bash
@@ -18,10 +33,18 @@ eas build --profile development --platform android  # build local APK
 The app is a Polish alphabet learning game for children. Navigation is file-based via Expo Router; all screens live under `app/`.
 
 **Screens**
-- `app/index.tsx` — home: reads `childName` from store, redirects to `/setup` if null, renders a `ModuleTile` grid + settings link. Guards against hydration flash via `_hasHydrated`.
+- `app/index.tsx` — home: `ImageBackground`, waving hand animation, `ModuleTile` grid (2 per row, size calculated from screen width), bottom nav bar with 3 image buttons. Guards hydration flash via `_hasHydrated`.
 - `app/setup.tsx` — first-run name entry; writes `childName` and replaces to `/`.
-- `app/settings.tsx` — change child profile; navigates back.
-- `app/exercise/[id].tsx` — looks up the module by id in the registry and renders its component.
+- `app/settings.tsx` — parent options: editable child name (TextInput + save), reset profile button. Accessed only via 5-second hold on the options button on home.
+- `app/score.tsx` — placeholder progress screen; home button returns to `/`.
+- `app/exercise/[id].tsx` — looks up module by id in the registry and renders its component.
+
+**Home bottom bar (`app/index.tsx`)**
+
+Three image buttons at the bottom, absolutely positioned:
+- `score.png` (left) → `/score`
+- `lessons.png` (center, larger, elevated) → `/lessons` (stub — screen not yet created)
+- `options.png` (right) → 5-second hold required; `Pressable` with `onPressIn`/`onPressOut`, modal appears immediately with hold instruction, navigates to `/settings` after 5 s
 
 **Exercise module system** (`exercises/`)
 

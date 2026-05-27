@@ -1,8 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getModule } from '../../exercises/registry';
-
-const BG = require('../../assets/images/shared/home-background-left.png') as number;
 
 export default function ExerciseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -13,11 +11,7 @@ export default function ExerciseScreen() {
 
   if (mod) {
     const ExerciseComponent = mod.component;
-    return (
-      <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
-        <ExerciseComponent />
-      </ImageBackground>
-    );
+    return <ExerciseComponent />;
   }
 
   return (
@@ -31,9 +25,8 @@ export default function ExerciseScreen() {
 }
 
 const styles = StyleSheet.create({
-  bg:          { flex: 1, backgroundColor: '#D6EAF8' },
-  fallback:    { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  label:       { fontSize: 20, marginBottom: 32, color: '#333' },
-  button:      { backgroundColor: '#007AFF', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },
-  buttonText:  { color: '#fff', fontSize: 18, fontWeight: '600' },
+  fallback:   { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  label:      { fontSize: 20, marginBottom: 32, color: '#333' },
+  button:     { backgroundColor: '#007AFF', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
 });

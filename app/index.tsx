@@ -55,7 +55,7 @@ export default function HomeScreen() {
   if (!hasHydrated) return null;
   if (!childName) return <Redirect href="/setup" />;
 
-  const barBottom = insets.bottom + 8;
+  const barBottom = insets.bottom + 24;
 
   return (
     <ImageBackground source={BG} style={styles.bg} resizeMode="cover">

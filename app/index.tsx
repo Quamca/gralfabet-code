@@ -4,7 +4,6 @@ import { Image, ImageBackground, Modal, Pressable, StyleSheet, Text, TouchableOp
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withRepeat,
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
@@ -56,15 +55,11 @@ export default function HomeScreen() {
 
   const waveRotation = useSharedValue(0);
   useEffect(() => {
-    waveRotation.value = withRepeat(
-      withSequence(
-        withTiming(22, { duration: 280 }),
-        withTiming(-10, { duration: 280 }),
-        withTiming(22, { duration: 280 }),
-        withTiming(0,  { duration: 360 }),
-        withTiming(0,  { duration: 1200 }),
-      ),
-      -1,
+    waveRotation.value = withSequence(
+      withTiming(22, { duration: 280 }),
+      withTiming(-10, { duration: 280 }),
+      withTiming(22, { duration: 280 }),
+      withTiming(0,  { duration: 360 }),
     );
   }, []);
   const waveStyle = useAnimatedStyle(() => ({

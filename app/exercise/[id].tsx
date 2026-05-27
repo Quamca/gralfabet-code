@@ -31,7 +31,7 @@ export default function ExerciseScreen() {
 }
 
 const styles = StyleSheet.create({
-  bg:          { flex: 1 },
+  bg:          { flex: 1, backgroundColor: '#D6EAF8' },
   fallback:    { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   label:       { fontSize: 20, marginBottom: 32, color: '#333' },
   button:      { backgroundColor: '#007AFF', paddingHorizontal: 32, paddingVertical: 16, borderRadius: 12 },

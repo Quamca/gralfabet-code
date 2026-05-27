@@ -9,6 +9,7 @@ import { LETTERS } from './audio-letters';
 
 const EXIT_ICON       = require('../../assets/images/shared/exit-button.png') as number;
 const PLAY_AGAIN_ICON = require('../../assets/images/shared/play-again-button.png') as number;
+const EMPTY_STATE     = require('../../assets/images/shared/empty-state.png') as number;
 
 const RESULT_CARD_SIZE = 140;
 const BUTTONS_DELAY_MS = 800;
@@ -66,6 +67,7 @@ export function ResultScreen({ drawings, onPlayAgain, onExit }: Props): React.Re
           </View>
         ) : (
           <View style={styles.emptySection}>
+            <Image source={EMPTY_STATE} style={styles.emptyImage} />
             <TouchableOpacity onPress={onPlayAgain} activeOpacity={0.7}>
               <Image source={PLAY_AGAIN_ICON} style={styles.btnIconLarge} />
             </TouchableOpacity>
@@ -96,7 +98,8 @@ const styles = StyleSheet.create({
   grid:         { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },
   card:         { width: RESULT_CARD_SIZE, height: RESULT_CARD_SIZE, backgroundColor: CORRECT_BG, borderRadius: 16, borderWidth: 2, borderColor: CORRECT_BORDER },
   cardHidden:   { opacity: 0 },
-  emptySection: { alignItems: 'center' },
+  emptySection: { alignItems: 'center', gap: 24 },
+  emptyImage:   { width: 200, height: 200, resizeMode: 'contain' },
   bottom:       { paddingVertical: 20 },
   bottomInner:  { flexDirection: 'row', justifyContent: 'center', gap: 32 },
   hidden:       { opacity: 0 },

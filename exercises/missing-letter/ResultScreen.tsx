@@ -6,6 +6,7 @@ import { type CollectedItem } from './ImageFanZone';
 
 const EXIT_ICON       = require('../../assets/images/shared/exit-button.png');
 const PLAY_AGAIN_ICON = require('../../assets/images/shared/play-again-button.png');
+const EMPTY_STATE     = require('../../assets/images/shared/empty-state.png');
 
 interface Props {
   collected: CollectedItem[];
@@ -33,6 +34,7 @@ export function ResultScreen({ collected, onPlayAgain, onExit }: Props): React.R
           </View>
         ) : (
           <View style={styles.emptySection}>
+            <Image source={EMPTY_STATE} style={styles.emptyImage} />
             <TouchableOpacity onPress={onPlayAgain} activeOpacity={0.7}>
               <Image source={PLAY_AGAIN_ICON} style={styles.btnIconLarge} />
             </TouchableOpacity>
@@ -62,7 +64,8 @@ const styles = StyleSheet.create({
   cardImg:      { width: 140, height: 140, resizeMode: 'contain' },
   placeholder:  { width: 140, height: 140, backgroundColor: '#B0BEC5', borderRadius: 8 },
   label:        { fontSize: 32, fontWeight: 'bold', color: '#333', marginTop: 10 },
-  emptySection: { alignItems: 'center' },
+  emptySection: { alignItems: 'center', gap: 24 },
+  emptyImage:   { width: 200, height: 200, resizeMode: 'contain' },
   bottom:       { flexDirection: 'row', justifyContent: 'center', gap: 32, paddingVertical: 20 },
   btnIcon:      { width: 80, height: 80, resizeMode: 'contain' },
   btnIconLarge: { width: 112, height: 112, resizeMode: 'contain' },

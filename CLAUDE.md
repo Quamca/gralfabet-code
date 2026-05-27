@@ -9,8 +9,9 @@ Issues are worked one at a time in order. For each issue:
 1. Create a feature branch from `develop`
 2. Implement, then `npx tsc --noEmit` — fix all errors before committing
 3. Commit and push, open a PR against `develop`
-4. **Wait for the user to say "zatwierdzam"** (or equivalent approval) before merging
-5. On approval: merge PR with `--delete-branch`, pull `develop`, proceed to the next issue
+4. **After opening the PR, post a short test checklist directly in the chat** — tell the user exactly what to tap/check on the device. Do not wait for them to ask.
+5. **Wait for the user to say "zatwierdzam"** (or equivalent approval) before merging
+6. On approval: merge PR with `--delete-branch`, pull `develop`, proceed to the next issue
 6. Update `gralfabet-vault/00_START_HERE/CURRENT_STATE.md` when a sprint closes
 
 **Git autonomy**: once the user approves ("zatwierdzam"), merge and continue without further confirmation. Do not ask again for the same action within the same issue.

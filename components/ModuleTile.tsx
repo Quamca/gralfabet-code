@@ -2,12 +2,16 @@ import { useRouter } from 'expo-router';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ExerciseModule } from '../exercises/types';
 
+const DEFAULT_TILE_SIZE = 120;
+
 interface Props {
   module: ExerciseModule;
+  size?: number;
 }
 
-export function ModuleTile({ module }: Props) {
+export function ModuleTile({ module, size = DEFAULT_TILE_SIZE }: Props) {
   const router = useRouter();
+  const iconSize = Math.round(size * 0.65);
 
   const handlePress = () => {
     router.push(`/exercise/${module.id}`);
@@ -15,26 +19,21 @@ export function ModuleTile({ module }: Props) {
 
   return (
     <TouchableOpacity
-      style={[styles.tile, { backgroundColor: module.tileColor ?? '#E8F4FD' }]}
+      style={[styles.tile, { backgroundColor: module.tileColor ?? '#E8F4FD', width: size, height: size }]}
       onPress={handlePress}
       accessibilityLabel={module.name}
       accessibilityRole="button"
     >
-      <View style={styles.iconBox}>
+      <View style={{ width: iconSize, height: iconSize, alignItems: 'center', justifyContent: 'center' }}>
         <Image source={module.icon} style={styles.iconImage} />
       </View>
     </TouchableOpacity>
   );
 }
 
-const TILE_SIZE = 120;
-const ICON_SIZE = 80;
-
 const styles = StyleSheet.create({
   tile: {
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    margin: 12,
+    margin: 8,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -43,12 +42,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
-  iconBox: {
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   iconImage: {
     width: '100%',

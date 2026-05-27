@@ -13,6 +13,7 @@ import { getAllModules } from '../exercises/registry';
 import { useAppStore } from '../store/useAppStore';
 
 const BG           = require('../assets/images/shared/home-background.png') as number;
+const BG_RIGHT     = require('../assets/images/shared/home-background-right.png') as number;
 const SCORE_ICON   = require('../assets/images/shared/score.png') as number;
 const LESSONS_ICON = require('../assets/images/shared/lessons.png') as number;
 const OPTIONS_ICON = require('../assets/images/shared/options.png') as number;
@@ -88,7 +89,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      <View style={[styles.bottomBar, { paddingBottom: barBottom }]}>
+      <ImageBackground source={BG_RIGHT} style={[styles.bottomBar, { paddingBottom: barBottom }]} resizeMode="cover">
         <TouchableOpacity onPress={() => router.push('/score')} accessibilityLabel="Postępy">
           <Image source={SCORE_ICON} style={styles.sideBtn} />
         </TouchableOpacity>
@@ -104,7 +105,7 @@ export default function HomeScreen() {
         >
           <Image source={OPTIONS_ICON} style={styles.sideBtn} />
         </Pressable>
-      </View>
+      </ImageBackground>
 
       <Modal visible={optionsModalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay} pointerEvents="none">

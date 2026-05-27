@@ -1,5 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { FLY_FADE_MS } from '../shared/timings';
 import { CORRECT_BG, CORRECT_BORDER } from '../shared/tokens';
 import { FAN_W, IMAGE_SIZE, STACK_PEEK, TOTAL_ROUNDS } from './gameUtils';
 
@@ -13,11 +15,15 @@ export function ImageFanZone({ items }: Props): React.ReactElement {
   return (
     <View style={styles.zone}>
       {items.map((item, i) => (
-        <View key={item.word + i} style={[styles.card, { left: STACK_BASE + i * STACK_PEEK, zIndex: i }]}>
+        <Animated.View
+          key={item.word + i}
+          entering={FadeIn.duration(FLY_FADE_MS)}
+          style={[styles.card, { left: STACK_BASE + i * STACK_PEEK, zIndex: i }]}
+        >
           {item.image
             ? <Image source={item.image} style={styles.img} />
             : <View style={styles.placeholder} />}
-        </View>
+        </Animated.View>
       ))}
     </View>
   );

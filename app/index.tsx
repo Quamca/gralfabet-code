@@ -22,9 +22,9 @@ const modules = getAllModules();
 
 const TILE_MARGIN      = 8;
 const CONTAINER_H_PAD  = 16;
-const SIDE_BTN_SIZE    = 64;
-const LESSONS_BTN_SIZE = 96;
-const BAR_HEIGHT       = 120;
+const SIDE_BTN_SIZE    = 110;
+const LESSONS_BTN_SIZE = 150;
+const BAR_HEIGHT       = 160;
 
 export default function HomeScreen() {
   const hasHydrated = useAppStore((s) => s._hasHydrated);

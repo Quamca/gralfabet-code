@@ -1,6 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { Image, ImageBackground, Modal, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -34,6 +34,25 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const tileSize = Math.floor((width - CONTAINER_H_PAD * 2 - TILE_MARGIN * 4) / 2);
+
+  const [optionsModalVisible, setOptionsModalVisible] = useState(false);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleOptionsIn = () => {
+    setOptionsModalVisible(true);
+    pressTimer.current = setTimeout(() => {
+      setOptionsModalVisible(false);
+      router.push('/settings');
+    }, 5000);
+  };
+
+  const handleOptionsOut = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+    setOptionsModalVisible(false);
+  };
 
   const waveRotation = useSharedValue(0);
   useEffect(() => {
@@ -83,10 +102,24 @@ export default function HomeScreen() {
           <Image source={LESSONS_ICON} style={styles.lessonsBtn} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push('/settings')} accessibilityLabel="Opcje">
+        <Pressable
+          onPressIn={handleOptionsIn}
+          onPressOut={handleOptionsOut}
+          accessibilityLabel="Opcje dla rodzica"
+        >
           <Image source={OPTIONS_ICON} style={styles.sideBtn} />
-        </TouchableOpacity>
+        </Pressable>
       </View>
+
+      <Modal visible={optionsModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay} pointerEvents="none">
+          <View style={[styles.modalBox, { marginBottom: barBottom + 24 + LESSONS_BTN_SIZE + 16 }]}>
+            <Text style={styles.modalText}>
+              Przytrzymaj przez 5 sekund,{'\n'}żeby wejść do ustawień
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 }
@@ -142,5 +175,27 @@ const styles = StyleSheet.create({
     width: LESSONS_BTN_SIZE,
     height: LESSONS_BTN_SIZE,
     resizeMode: 'contain',
+  },
+  modalOverlay: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  modalBox: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 36,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  modalText: {
+    fontSize: 20,
+    color: '#1C1C1E',
+    textAlign: 'center',
+    lineHeight: 30,
   },
 });

@@ -1,7 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store/useAppStore';
+
+const EXIT_ICON = require('../assets/images/shared/exit-button.png') as number;
 
 export default function SettingsScreen() {
   const childName    = useAppStore((s) => s.childName);
@@ -9,6 +12,7 @@ export default function SettingsScreen() {
   const clearProfile = useAppStore((s) => s.clearProfile);
   const router = useRouter();
 
+  const insets = useSafeAreaInsets();
   const [editName, setEditName] = useState(childName ?? '');
   const trimmed = editName.trim();
 
@@ -22,44 +26,41 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ustawienia</Text>
+    <View style={[styles.container, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Ustawienia</Text>
 
-      <Text style={styles.label}>Imię dziecka</Text>
-      <TextInput
-        style={styles.input}
-        value={editName}
-        onChangeText={setEditName}
-        maxLength={30}
-        returnKeyType="done"
-        onSubmitEditing={handleSave}
-      />
-      <TouchableOpacity
-        style={[styles.saveButton, !trimmed && styles.saveButtonDisabled]}
-        onPress={handleSave}
-        disabled={!trimmed}
-        accessibilityLabel="Zapisz imię"
-        accessibilityRole="button"
-      >
-        <Text style={styles.saveButtonText}>Zapisz</Text>
-      </TouchableOpacity>
+        <Text style={styles.label}>Imię dziecka</Text>
+        <TextInput
+          style={styles.input}
+          value={editName}
+          onChangeText={setEditName}
+          maxLength={30}
+          returnKeyType="done"
+          onSubmitEditing={handleSave}
+        />
+        <TouchableOpacity
+          style={[styles.saveButton, !trimmed && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={!trimmed}
+          accessibilityLabel="Zapisz imię"
+          accessibilityRole="button"
+        >
+          <Text style={styles.saveButtonText}>Zapisz</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.changeButton}
-        onPress={handleChangeProfile}
-        accessibilityLabel="Resetuj profil gracza"
-        accessibilityRole="button"
-      >
-        <Text style={styles.changeButtonText}>Resetuj profil</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.changeButton}
+          onPress={handleChangeProfile}
+          accessibilityLabel="Resetuj profil gracza"
+          accessibilityRole="button"
+        >
+          <Text style={styles.changeButtonText}>Resetuj profil</Text>
+        </TouchableOpacity>
+      </View>
 
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.back()}
-        accessibilityLabel="Wróć do menu"
-        accessibilityRole="button"
-      >
-        <Text style={styles.backButtonText}>Wróć</Text>
+      <TouchableOpacity onPress={() => router.replace('/')} accessibilityLabel="Wróć do menu">
+        <Image source={EXIT_ICON} style={styles.homeBtn} />
       </TouchableOpacity>
     </View>
   );
@@ -69,9 +70,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
+    justifyContent: 'space-between',
+    paddingHorizontal: 32,
     backgroundColor: '#fff',
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   title: {
     fontSize: 32,
@@ -123,15 +130,9 @@ const styles = StyleSheet.create({
     color: '#FF3B30',
     fontSize: 16,
   },
-  backButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    minWidth: 200,
-    alignItems: 'center',
-  },
-  backButtonText: {
-    color: '#007AFF',
-    fontSize: 18,
+  homeBtn: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
   },
 });

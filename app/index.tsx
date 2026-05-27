@@ -1,6 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, Modal, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Image, ImageBackground, Modal, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,6 +12,7 @@ import { ModuleTile } from '../components/ModuleTile';
 import { getAllModules } from '../exercises/registry';
 import { useAppStore } from '../store/useAppStore';
 
+const BG           = require('../assets/images/shared/home-background.png') as number;
 const SCORE_ICON   = require('../assets/images/shared/score.png') as number;
 const LESSONS_ICON = require('../assets/images/shared/lessons.png') as number;
 const OPTIONS_ICON = require('../assets/images/shared/options.png') as number;
@@ -71,7 +72,7 @@ export default function HomeScreen() {
   const barBottom = insets.bottom + 24;
 
   return (
-    <View style={styles.bg}>
+    <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
       <View style={[styles.container, { paddingTop: insets.top + 80, paddingBottom: BAR_HEIGHT + insets.bottom }]}>
         <View style={styles.greeting}>
           <Animated.View style={waveStyle}>
@@ -114,7 +115,7 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ImageBackground>
   );
 }
 

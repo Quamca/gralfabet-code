@@ -13,7 +13,7 @@ function LetterTraceModule(): React.ReactElement {
     return (
       <GameScreen
         onComplete={(d) => { setDrawings(d); setPhase('result'); }}
-        onExit={() => router.back()}
+        onExit={() => router.push('/')}
       />
     );
   }
@@ -22,7 +22,7 @@ function LetterTraceModule(): React.ReactElement {
     <ResultScreen
       drawings={drawings}
       onPlayAgain={() => { setDrawings([]); setPhase('playing'); }}
-      onExit={() => router.back()}
+      onExit={() => router.push('/')}
     />
   );
 }

@@ -11,19 +11,16 @@ type Props = {
 
 export function AlignedBackground({ panel, children }: Props) {
   const { width: screenW, height: screenH } = useWindowDimensions();
-  const scale = screenH / IMG_H;
-  const dispW = IMG_W * scale;
+  const dispW = IMG_W * (screenH / IMG_H);
 
   const panelOffset = panel === 'left' ? 0 : panel === 'center' ? screenW : 2 * screenW;
-  const left = -panelOffset;
-  const top = 0;
 
   return (
     <View style={styles.fill}>
       <View style={[StyleSheet.absoluteFill, styles.clip]}>
         <Image
           source={BCG}
-          style={{ position: 'absolute', left, top, width: dispW, height: screenH }}
+          style={{ position: 'absolute', left: -panelOffset, top: 0, bottom: 0, width: dispW }}
         />
       </View>
       {children}

@@ -27,7 +27,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <AlignedBackground panel="right">
+    <AlignedBackground panel="left">
     <View style={[styles.container, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
       <View style={styles.content}>
         <Text style={styles.title}>Ustawienia</Text>

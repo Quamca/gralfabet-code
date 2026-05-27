@@ -3,7 +3,7 @@ import { AlignedBackground } from '../../components/AlignedBackground';
 
 export default function ExerciseLayout() {
   return (
-    <AlignedBackground panel="left">
+    <AlignedBackground panel="right">
       <Slot />
     </AlignedBackground>
   );

@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   exitBtnImg: {
-    width: 52,
-    height: 52,
+    width: 82,
+    height: 82,
     resizeMode: 'contain',
   },
 });

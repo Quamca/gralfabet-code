@@ -1,6 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, ImageBackground, Modal, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { BackHandler, Image, ImageBackground, Modal, Platform, Pressable, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -16,6 +16,7 @@ const BG           = require('../assets/images/shared/home-background.png') as n
 const SCORE_ICON   = require('../assets/images/shared/score.png') as number;
 const LESSONS_ICON = require('../assets/images/shared/lessons.png') as number;
 const OPTIONS_ICON = require('../assets/images/shared/options.png') as number;
+const EXIT_APP_ICON = require('../assets/images/shared/exit-app.png') as number;
 
 const modules = getAllModules();
 
@@ -73,6 +74,15 @@ export default function HomeScreen() {
 
   return (
     <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
+      {Platform.OS === 'android' && (
+        <TouchableOpacity
+          style={[styles.exitBtn, { top: insets.top + 8 }]}
+          onPress={() => BackHandler.exitApp()}
+          accessibilityLabel="Zamknij aplikację"
+        >
+          <Image source={EXIT_APP_ICON} style={styles.exitBtnImg} />
+        </TouchableOpacity>
+      )}
       <View style={[styles.container, { paddingTop: insets.top + 80, paddingBottom: BAR_HEIGHT + insets.bottom }]}>
         <View style={styles.greeting}>
           <Animated.View style={waveStyle}>
@@ -192,5 +202,15 @@ const styles = StyleSheet.create({
     color: '#1C1C1E',
     textAlign: 'center',
     lineHeight: 30,
+  },
+  exitBtn: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 10,
+  },
+  exitBtnImg: {
+    width: 82,
+    height: 82,
+    resizeMode: 'contain',
   },
 });

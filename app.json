@@ -6,9 +6,16 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "platforms": ["android", "ios"],
+    "icon": "./assets/images/shared/gralfabet.png",
+    "splash": {
+      "image": "./assets/images/shared/splash-screen.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#F9F4EC"
+    },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/images/shared/gralfabet.png",
+        "backgroundColor": "#F9F4EC"
       }
     },
     "scheme": "gralfabet",

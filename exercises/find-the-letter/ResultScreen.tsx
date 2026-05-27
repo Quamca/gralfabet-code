@@ -6,6 +6,7 @@ import { type RoundResult } from './gameUtils';
 
 const EXIT_ICON       = require('../../assets/images/shared/exit-button.png');
 const PLAY_AGAIN_ICON = require('../../assets/images/shared/play-again-button.png');
+const EMPTY_STATE     = require('../../assets/images/shared/empty-state.png');
 
 interface Props {
   results: RoundResult[];
@@ -37,6 +38,7 @@ export function ResultScreen({ results, onPlayAgain, onExit }: Props): React.Rea
           </View>
         ) : (
           <View style={styles.emptySection}>
+            <Image source={EMPTY_STATE} style={styles.emptyImage} />
             <TouchableOpacity onPress={onPlayAgain} activeOpacity={0.7}>
               <Image source={PLAY_AGAIN_ICON} style={styles.btnIconLarge} />
             </TouchableOpacity>
@@ -66,7 +68,8 @@ const styles = StyleSheet.create({
   card:         { backgroundColor: CORRECT_BG, borderRadius: 16, paddingVertical: 20, paddingHorizontal: 16, alignItems: 'center', borderWidth: 2, borderColor: CORRECT_BORDER, minWidth: '42%' },
   cardUpper:    { fontSize: 48, fontWeight: 'bold', color: '#333' },
   cardLower:    { fontSize: 24, color: '#666', marginTop: 4 },
-  emptySection: { alignItems: 'center' },
+  emptySection: { alignItems: 'center', gap: 24 },
+  emptyImage:   { width: 200, height: 200, resizeMode: 'contain' },
   bottom:       { flexDirection: 'row', justifyContent: 'center', gap: 32, paddingVertical: 20 },
   btnIcon:      { width: 80, height: 80, resizeMode: 'contain' },
   btnIconLarge: { width: 112, height: 112, resizeMode: 'contain' },

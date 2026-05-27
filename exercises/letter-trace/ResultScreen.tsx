@@ -92,7 +92,7 @@ export function ResultScreen({ drawings, onPlayAgain, onExit }: Props): React.Re
 }
 
 const styles = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: SCREEN_BG, padding: CONTAINER_PAD },
+  container:    { flex: 1, backgroundColor: 'transparent', padding: CONTAINER_PAD },
   content:      { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title:        { fontSize: 28, fontWeight: 'bold', color: '#333', textAlign: 'center', marginBottom: 24 },
   grid:         { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 16 },

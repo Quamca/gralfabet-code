@@ -299,7 +299,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: SCREEN_BG },
+  container:      { flex: 1, backgroundColor: 'transparent' },
   content:        { flex: 1, paddingHorizontal: CONTAINER_PAD },
   centerArea:     { flex: 1, alignItems: 'center', justifyContent: 'center' },
   illustration:   { width: IMAGE_SIZE, height: IMAGE_SIZE, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },

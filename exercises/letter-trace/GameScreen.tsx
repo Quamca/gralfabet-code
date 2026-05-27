@@ -194,7 +194,7 @@ function phaseToStrokeColor(phase: Phase): string {
 }
 
 const styles = StyleSheet.create({
-  container:          { flex: 1, backgroundColor: SCREEN_BG, alignItems: 'center' },
+  container:          { flex: 1, backgroundColor: 'transparent', alignItems: 'center' },
   canvasArea:         { flex: 1, justifyContent: 'flex-end', marginBottom: 24 },
   canvasBorder:       { borderWidth: 1, borderColor: '#ccc', borderRadius: 4 },
   canvasBorderSuccess: {

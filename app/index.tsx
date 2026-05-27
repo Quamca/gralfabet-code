@@ -113,7 +113,7 @@ export default function HomeScreen() {
 
       <Modal visible={optionsModalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay} pointerEvents="none">
-          <View style={styles.modalBox}>
+          <View style={[styles.modalBox, { marginBottom: barBottom + 24 + LESSONS_BTN_SIZE + 16 }]}>
             <Text style={styles.modalText}>
               Przytrzymaj przez 5 sekund,{'\n'}żeby wejść do ustawień
             </Text>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
   },
   modalBox: {
     backgroundColor: '#fff',

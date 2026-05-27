@@ -13,6 +13,7 @@
       "backgroundColor": "#F9F4EC"
     },
     "android": {
+      "package": "com.quamca.gralfabet",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/shared/gralfabet.png",
         "backgroundColor": "#F9F4EC"

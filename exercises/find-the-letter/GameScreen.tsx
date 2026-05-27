@@ -178,7 +178,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
 }
 
 const styles = StyleSheet.create({
-  container:   { flex: 1, backgroundColor: '#FFFDE7' },
+  container:   { flex: 1, backgroundColor: 'transparent' },
   content:     { flex: 1, paddingHorizontal: CONTAINER_PAD },
   gridArea:    { flex: 1, alignItems: 'center', justifyContent: 'center' },
   bottom:      { alignItems: 'center', paddingVertical: 20 },

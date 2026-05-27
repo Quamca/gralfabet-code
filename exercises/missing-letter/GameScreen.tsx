@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
-  cancelAnimation, useAnimatedStyle, useSharedValue,
+  cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue,
   withRepeat, withSequence, withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -53,6 +53,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const [filledLetter, setFilledLetter] = useState<string | null>(null);
   const [isCorrect, setIsCorrect]       = useState(false);
   const [collected, setCollected]       = useState<CollectedItem[]>([]);
+  const [flyingEntry, setFlyingEntry]   = useState<CollectedItem | null>(null);
 
   const lockedRef     = useRef(false);
   const roundIndexRef = useRef(roundIndex);
@@ -62,19 +63,15 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const imageRef      = useRef<View>(null);
   roundIndexRef.current = roundIndex;
 
-  // flyOpacity drives both the fly card opacity and the illustration visibility.
-  // illustrationStyle hides the illustration on the UI thread whenever flyOpacity > 0 —
-  // no isFlyingImage React state needed, so there is no JS→UI sync race on round transitions.
-  const flyX            = useSharedValue(0);
-  const flyY            = useSharedValue(0);
-  const flyOpacity      = useSharedValue(0);
-  const tilesOp         = useSharedValue(1);
-  const hintOp          = useSharedValue(1);
-  const pulseScale      = useSharedValue(1);
-  const showIllustration = useSharedValue(1);
+  const flyX       = useSharedValue(0);
+  const flyY       = useSharedValue(0);
+  const flyOpacity = useSharedValue(0);
+  const tilesOp    = useSharedValue(1);
+  const hintOp     = useSharedValue(1);
+  const pulseScale = useSharedValue(1);
 
   const illustrationStyle = useAnimatedStyle(() => ({
-    opacity: flyOpacity.value > 0 || showIllustration.value === 0 ? 0 : 1,
+    opacity: flyOpacity.value > 0 ? 0 : 1,
   }));
   const flyCardStyle = useAnimatedStyle(() => ({
     left:    flyX.value,
@@ -98,7 +95,6 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   useEffect(() => { return () => { cancel(); }; }, [cancel]);
 
   useEffect(() => {
-    showIllustration.value = 1;
     lockedRef.current = false;
     setErrors(0);
     setWrongLetters([]);
@@ -131,7 +127,6 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   }, [showHint, pulseScale]);
 
   const advance = useCallback(() => {
-    showIllustration.value = 0;
     lockedRef.current = false;
     setFilledLetter(null);
     setWrongLetters([]);
@@ -141,6 +136,11 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
       : onComplete(resultsRef.current, collectedRef.current);
   }, [onComplete]);
 
+  const clearAndAdvance = useCallback(() => {
+    setFlyingEntry(null);
+    advance();
+  }, [advance]);
+
   const startFly = useCallback((letter: string, entry: WordEntry, outcome: Outcome) => {
     const newItem: CollectedItem = { image: entry.image, word: entry.word };
     const idx       = collectedRef.current.length;
@@ -148,6 +148,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
     const targetX   = CONTAINER_PAD + stackBase + idx * STACK_PEEK;
     const targetY   = safeTop + CONTAINER_PAD + 8;
 
+    setFlyingEntry(newItem);
     setFilledLetter(letter);
     setIsCorrect(true);
     void playSequence([DOBRZE]);
@@ -168,17 +169,17 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
           cancel();
 
           setTimeout(() => {
-            showIllustration.value = 0;
-            flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS });
             setIsCorrect(false);
             setCollectedAndRef((prev) => [...prev, newItem]);
-            setTimeout(advance, FLY_FADE_MS);
+            flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {
+              if (done) runOnJS(clearAndAdvance)();
+            });
           }, FLY_DURATION_MS);
         });
       });
     }, REVEAL_STABLE_MS);
-  }, [safeTop, playSequence, cancel, updateLetter, advance, setCollectedAndRef,
-      flyX, flyY, flyOpacity, tilesOp, showIllustration]);
+  }, [safeTop, playSequence, cancel, updateLetter, clearAndAdvance, setCollectedAndRef,
+      flyX, flyY, flyOpacity, tilesOp]);
 
   const handleTilePress = useCallback((letter: string) => {
     if (lockedRef.current) return;
@@ -293,11 +294,13 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
         </View>
       </View>
 
-      <Animated.View style={[styles.flyCard, flyCardStyle]} pointerEvents="none">
-        {currentEntry.image
-          ? <Image source={currentEntry.image} style={styles.flyImage} />
-          : <Text style={styles.flySymbol}>_</Text>}
-      </Animated.View>
+      {flyingEntry !== null && (
+        <Animated.View style={[styles.flyCard, flyCardStyle]} pointerEvents="none">
+          {flyingEntry.image
+            ? <Image source={flyingEntry.image} style={styles.flyImage} />
+            : <Text style={styles.flySymbol}>_</Text>}
+        </Animated.View>
+      )}
     </View>
   );
 }

@@ -63,15 +63,16 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const imageRef      = useRef<View>(null);
   roundIndexRef.current = roundIndex;
 
-  const flyX       = useSharedValue(0);
-  const flyY       = useSharedValue(0);
-  const flyOpacity = useSharedValue(0);
-  const tilesOp    = useSharedValue(1);
-  const hintOp     = useSharedValue(1);
-  const pulseScale = useSharedValue(1);
+  const flyX            = useSharedValue(0);
+  const flyY            = useSharedValue(0);
+  const flyOpacity      = useSharedValue(0);
+  const tilesOp         = useSharedValue(1);
+  const hintOp          = useSharedValue(1);
+  const pulseScale      = useSharedValue(1);
+  const showIllustration = useSharedValue(1);
 
   const illustrationStyle = useAnimatedStyle(() => ({
-    opacity: flyOpacity.value > 0 ? 0 : 1,
+    opacity: flyOpacity.value > 0 || showIllustration.value === 0 ? 0 : 1,
   }));
   const flyCardStyle = useAnimatedStyle(() => ({
     left:    flyX.value,
@@ -95,6 +96,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   useEffect(() => { return () => { cancel(); }; }, [cancel]);
 
   useEffect(() => {
+    showIllustration.value = 1;
     lockedRef.current = false;
     setErrors(0);
     setWrongLetters([]);
@@ -169,6 +171,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
           cancel();
 
           setTimeout(() => {
+            showIllustration.value = 0;
             setIsCorrect(false);
             setCollectedAndRef((prev) => [...prev, newItem]);
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS }, (done) => {

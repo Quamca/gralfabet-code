@@ -1,53 +1,58 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { useAudio } from '../hooks/useAudio';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const TEST_BEEP = require('../assets/sounds/test-beep.wav') as number;
 
 export default function SettingsScreen() {
+  const childName    = useAppStore((s) => s.childName);
+  const setChildName = useAppStore((s) => s.setChildName);
   const clearProfile = useAppStore((s) => s.clearProfile);
-  const childName = useAppStore((s) => s.childName);
   const router = useRouter();
-  const { play } = useAudio(TEST_BEEP);
-  const [audioPlayed, setAudioPlayed] = useState(false);
+
+  const [editName, setEditName] = useState(childName ?? '');
+  const trimmed = editName.trim();
+
+  const handleSave = () => {
+    if (trimmed) setChildName(trimmed);
+  };
 
   const handleChangeProfile = () => {
     clearProfile();
     router.replace('/setup');
   };
 
-  const handleTestAudio = async () => {
-    await play();
-    setAudioPlayed(true);
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Ustawienia</Text>
-      {childName ? (
-        <Text style={styles.info}>Gracz: {childName}</Text>
-      ) : null}
+
+      <Text style={styles.label}>Imię dziecka</Text>
+      <TextInput
+        style={styles.input}
+        value={editName}
+        onChangeText={setEditName}
+        maxLength={30}
+        returnKeyType="done"
+        onSubmitEditing={handleSave}
+      />
       <TouchableOpacity
-        style={styles.audioButton}
-        onPress={handleTestAudio}
-        accessibilityLabel="Odtwórz testowy dźwięk"
+        style={[styles.saveButton, !trimmed && styles.saveButtonDisabled]}
+        onPress={handleSave}
+        disabled={!trimmed}
+        accessibilityLabel="Zapisz imię"
         accessibilityRole="button"
       >
-        <Text style={styles.audioButtonText}>
-          {audioPlayed ? '✓ Dźwięk odtworzony' : '🔊 Test audio'}
-        </Text>
+        <Text style={styles.saveButtonText}>Zapisz</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.changeButton}
         onPress={handleChangeProfile}
-        accessibilityLabel="Zmień profil gracza"
+        accessibilityLabel="Resetuj profil gracza"
         accessibilityRole="button"
       >
-        <Text style={styles.changeButtonText}>Zmień profil</Text>
+        <Text style={styles.changeButtonText}>Resetuj profil</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => router.back()}
@@ -71,40 +76,52 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 24,
+    marginBottom: 40,
   },
-  info: {
-    fontSize: 18,
+  label: {
+    fontSize: 16,
     color: '#555',
-    marginBottom: 32,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
   },
-  audioButton: {
+  input: {
+    width: '100%',
+    fontSize: 24,
+    borderWidth: 2,
+    borderColor: '#007AFF',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  saveButton: {
     backgroundColor: '#007AFF',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 32,
     minWidth: 200,
     alignItems: 'center',
   },
-  audioButtonText: {
+  saveButtonDisabled: {
+    backgroundColor: '#C7C7CC',
+  },
+  saveButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
   },
   changeButton: {
-    backgroundColor: '#FF3B30',
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 8,
     minWidth: 200,
     alignItems: 'center',
   },
   changeButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#FF3B30',
+    fontSize: 16,
   },
   backButton: {
     paddingVertical: 16,

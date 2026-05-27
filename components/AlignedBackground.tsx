@@ -20,6 +20,7 @@ export function AlignedBackground({ panel, children }: Props) {
       <View style={[StyleSheet.absoluteFill, styles.clip]}>
         <Image
           source={BCG}
+          resizeMode="cover"
           style={{ position: 'absolute', left: -panelOffset, top: 0, bottom: 0, width: dispW }}
         />
       </View>

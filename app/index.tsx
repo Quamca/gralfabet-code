@@ -13,7 +13,6 @@ import { ModuleTile } from '../components/ModuleTile';
 import { getAllModules } from '../exercises/registry';
 import { useAppStore } from '../store/useAppStore';
 
-const BG           = require('../assets/images/shared/home-background.png') as number;
 const SCORE_ICON   = require('../assets/images/shared/score.png') as number;
 const LESSONS_ICON = require('../assets/images/shared/lessons.png') as number;
 const OPTIONS_ICON = require('../assets/images/shared/options.png') as number;
@@ -74,7 +73,7 @@ export default function HomeScreen() {
   const barBottom = insets.bottom + 24;
 
   return (
-    <AlignedBackground source={BG} align="center">
+    <AlignedBackground panel="center">
       {Platform.OS === 'android' && (
         <TouchableOpacity
           style={[styles.exitBtn, { top: insets.top + 8 }]}

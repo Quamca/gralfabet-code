@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store/useAppStore';
 
 const EXIT_ICON = require('../assets/images/shared/exit-button.png') as number;
-const BG        = require('../assets/images/shared/home-background-right.png') as number;
 
 export default function SettingsScreen() {
   const childName    = useAppStore((s) => s.childName);
@@ -28,7 +27,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <AlignedBackground source={BG} align="left">
+    <AlignedBackground panel="right">
     <View style={[styles.container, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
       <View style={styles.content}>
         <Text style={styles.title}>Ustawienia</Text>

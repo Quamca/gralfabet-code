@@ -1,6 +1,6 @@
-import { Redirect } from 'expo-router';
+import { Redirect, useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image, ImageBackground, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -13,18 +13,25 @@ import { ModuleTile } from '../components/ModuleTile';
 import { getAllModules } from '../exercises/registry';
 import { useAppStore } from '../store/useAppStore';
 
-const BG = require('../assets/images/shared/home-background.png') as number;
+const BG           = require('../assets/images/shared/home-background.png') as number;
+const SCORE_ICON   = require('../assets/images/shared/score.png') as number;
+const LESSONS_ICON = require('../assets/images/shared/lessons.png') as number;
+const OPTIONS_ICON = require('../assets/images/shared/options.png') as number;
 
 const modules = getAllModules();
 
-const TILE_MARGIN = 8;
-const CONTAINER_H_PAD = 16;
+const TILE_MARGIN      = 8;
+const CONTAINER_H_PAD  = 16;
+const SIDE_BTN_SIZE    = 64;
+const LESSONS_BTN_SIZE = 96;
+const BAR_HEIGHT       = 120;
 
 export default function HomeScreen() {
   const hasHydrated = useAppStore((s) => s._hasHydrated);
   const childName = useAppStore((s) => s.childName);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const router = useRouter();
 
   const tileSize = Math.floor((width - CONTAINER_H_PAD * 2 - TILE_MARGIN * 4) / 2);
 
@@ -48,9 +55,11 @@ export default function HomeScreen() {
   if (!hasHydrated) return null;
   if (!childName) return <Redirect href="/setup" />;
 
+  const barBottom = insets.bottom + 8;
+
   return (
     <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
-      <View style={[styles.container, { paddingTop: insets.top + 80, paddingBottom: insets.bottom + 100 }]}>
+      <View style={[styles.container, { paddingTop: insets.top + 80, paddingBottom: BAR_HEIGHT + insets.bottom }]}>
         <View style={styles.greeting}>
           <Animated.View style={waveStyle}>
             <Text style={styles.greetingEmoji}>👋</Text>
@@ -63,6 +72,20 @@ export default function HomeScreen() {
             <ModuleTile key={mod.id} module={mod} size={tileSize} />
           ))}
         </View>
+      </View>
+
+      <View style={[styles.bottomBar, { paddingBottom: barBottom }]}>
+        <TouchableOpacity onPress={() => router.push('/score')} accessibilityLabel="Postępy">
+          <Image source={SCORE_ICON} style={styles.sideBtn} />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.lessonsWrapper} onPress={() => router.push('/lessons')} accessibilityLabel="Lekcje">
+          <Image source={LESSONS_ICON} style={styles.lessonsBtn} />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push('/settings')} accessibilityLabel="Opcje">
+          <Image source={OPTIONS_ICON} style={styles.sideBtn} />
+        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -96,5 +119,28 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     flex: 1,
+  },
+  bottomBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-around',
+    paddingHorizontal: 16,
+  },
+  sideBtn: {
+    width: SIDE_BTN_SIZE,
+    height: SIDE_BTN_SIZE,
+    resizeMode: 'contain',
+  },
+  lessonsWrapper: {
+    marginBottom: 24,
+  },
+  lessonsBtn: {
+    width: LESSONS_BTN_SIZE,
+    height: LESSONS_BTN_SIZE,
+    resizeMode: 'contain',
   },
 });

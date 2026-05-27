@@ -171,8 +171,10 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
             showIllustration.value = 0;
             flyOpacity.value = withTiming(0, { duration: FLY_FADE_MS });
             setIsCorrect(false);
-            setCollectedAndRef((prev) => [...prev, newItem]);
-            setTimeout(advance, FLY_FADE_MS);
+            setTimeout(() => {
+              setCollectedAndRef((prev) => [...prev, newItem]);
+              advance();
+            }, FLY_FADE_MS);
           }, FLY_DURATION_MS);
         });
       });

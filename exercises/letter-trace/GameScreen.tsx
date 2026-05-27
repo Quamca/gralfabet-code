@@ -5,7 +5,7 @@ import Animated, { runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Canvas, Path as SkiaPath, Rect, Skia,
-  Text as SkiaText, matchFont,
+  Text as SkiaText, useFont,
 } from '@shopify/react-native-skia';
 import { CORRECT_BG, SCREEN_BG } from '../shared/tokens';
 import { selectLetterEntries } from './letter-data';
@@ -41,9 +41,9 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const canvasSize       = Math.round(width * 0.72);
   const fontSz           = Math.round(canvasSize * 0.75);
 
-  const font = useMemo(
-    () => matchFont({ fontFamily: 'sans-serif', fontSize: fontSz, fontWeight: 'bold' }),
-    [fontSz],
+  const font = useFont(
+    require('../../assets/fonts/PatrickHand-Regular.ttf'),
+    fontSz,
   );
 
   const containerRef  = useRef<View>(null);

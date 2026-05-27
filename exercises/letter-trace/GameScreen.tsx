@@ -7,7 +7,7 @@ import {
   Canvas, Path as SkiaPath, Rect, Skia,
   Text as SkiaText, useFont,
 } from '@shopify/react-native-skia';
-import { CORRECT_BG, SCREEN_BG } from '../shared/tokens';
+import { CONTAINER_PAD, CORRECT_BG, SCREEN_BG } from '../shared/tokens';
 import { selectLetterEntries } from './letter-data';
 import { getPromptAudio, TRY_AGAIN } from './audio-assets';
 import { buildLetterGrid } from './letter-trace-utils';
@@ -134,7 +134,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
 
   return (
     <View ref={containerRef} style={styles.container}>
-      <View style={{ paddingTop: safeTop + 4 }}>
+      <View style={{ paddingTop: safeTop + CONTAINER_PAD }}>
         <TraceFanZone ref={fanZoneRef} drawings={collectedDrawings} canvasWidth={canvasSize} />
       </View>
 

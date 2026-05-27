@@ -1,16 +1,12 @@
 import { Slot } from 'expo-router';
-import { ImageBackground, StyleSheet } from 'react-native';
+import { AlignedBackground } from '../../components/AlignedBackground';
 
 const BG = require('../../assets/images/shared/home-background-left.png') as number;
 
 export default function ExerciseLayout() {
   return (
-    <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
+    <AlignedBackground source={BG} align="right">
       <Slot />
-    </ImageBackground>
+    </AlignedBackground>
   );
 }
-
-const styles = StyleSheet.create({
-  bg: { flex: 1 },
-});

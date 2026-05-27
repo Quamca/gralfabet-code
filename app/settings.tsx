@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AlignedBackground } from '../components/AlignedBackground';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store/useAppStore';
 
@@ -27,7 +28,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ImageBackground source={BG} style={styles.bg} resizeMode="cover">
+    <AlignedBackground source={BG} align="left">
     <View style={[styles.container, { paddingTop: insets.top + 24, paddingBottom: insets.bottom + 24 }]}>
       <View style={styles.content}>
         <Text style={styles.title}>Ustawienia</Text>
@@ -65,12 +66,11 @@ export default function SettingsScreen() {
         <Image source={EXIT_ICON} style={styles.homeBtn} />
       </TouchableOpacity>
     </View>
-    </ImageBackground>
+    </AlignedBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  bg: { flex: 1 },
   container: {
     flex: 1,
     alignItems: 'center',

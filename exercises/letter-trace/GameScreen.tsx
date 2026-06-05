@@ -150,7 +150,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
                 <SkiaPath
                   path={letterPathRef.current}
                   style="stroke"
-                  strokeWidth={55}
+                  strokeWidth={28}
                   strokeCap="round"
                   strokeJoin="round"
                   color={isSuccess ? '#43A047' : '#2C3E50'}

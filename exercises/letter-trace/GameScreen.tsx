@@ -147,21 +147,14 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
                 <Rect x={0} y={0} width={canvasSize} height={canvasSize} color={CORRECT_BG} />
               )}
               {font && letterPathRef.current && (
-                <>
-                  <SkiaPath
-                    path={letterPathRef.current}
-                    style="stroke"
-                    strokeWidth={20}
-                    strokeCap="round"
-                    strokeJoin="round"
-                    color={isSuccess ? '#43A047' : '#2C3E50'}
-                  />
-                  <SkiaPath
-                    path={letterPathRef.current}
-                    style="fill"
-                    color={isSuccess ? '#43A047' : '#2C3E50'}
-                  />
-                </>
+                <SkiaPath
+                  path={letterPathRef.current}
+                  style="stroke"
+                  strokeWidth={55}
+                  strokeCap="round"
+                  strokeJoin="round"
+                  color={isSuccess ? '#43A047' : '#2C3E50'}
+                />
               )}
               {strokePath && (
                 <SkiaPath

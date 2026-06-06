@@ -4,8 +4,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-  Canvas, Path as SkiaPath, Rect, Skia,
-  Text as SkiaText, useFont,
+  Canvas, Path as SkiaPath, Rect, Skia, useFont,
 } from '@shopify/react-native-skia';
 import { CONTAINER_PAD, CORRECT_BG, SCREEN_BG } from '../shared/tokens';
 import { selectLetterEntries } from './letter-data';
@@ -39,7 +38,7 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
   const { width }        = useWindowDimensions();
   const { top: safeTop } = useSafeAreaInsets();
   const canvasSize       = Math.round(width * 0.72);
-  const fontSz           = Math.round(canvasSize * 0.75);
+  const fontSz           = Math.round(canvasSize * 0.82);
 
   const font = useFont(
     require('../../assets/fonts/PatrickHand-Regular.ttf'),
@@ -147,21 +146,29 @@ export function GameScreen({ onComplete, onExit }: Props): React.ReactElement {
               {isSuccess && (
                 <Rect x={0} y={0} width={canvasSize} height={canvasSize} color={CORRECT_BG} />
               )}
-              {font && (
-                <SkiaText
-                  text={currentEntry.letter}
-                  x={letterX}
-                  y={letterY}
-                  font={font}
-                  color={isSuccess ? '#43A047' : '#2C3E50'}
-                />
+              {font && letterPathRef.current && (
+                <>
+                  <SkiaPath
+                    path={letterPathRef.current}
+                    style="fill"
+                    color={isSuccess ? '#43A047' : '#2C3E50'}
+                  />
+                  <SkiaPath
+                    path={letterPathRef.current}
+                    style="stroke"
+                    strokeWidth={20}
+                    strokeCap="round"
+                    strokeJoin="round"
+                    color={isSuccess ? '#43A047' : '#2C3E50'}
+                  />
+                </>
               )}
               {strokePath && (
                 <SkiaPath
                   path={strokePath}
                   color={strokeColor}
                   style="stroke"
-                  strokeWidth={22}
+                  strokeWidth={30}
                   strokeCap="round"
                   strokeJoin="round"
                 />
